@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:vm="clr-namespace:AvaloniaSpaceInvaders.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="AvaloniaSpaceInvaders.Views.SecondView"
+		x:DataType="vm:SecondViewModel"
+		Background="Black">
+	
+
+	<Design.DataContext>
+		<vm:SecondViewModel />
+	</Design.DataContext>
+	<StackPanel>
+		<TextBlock
+            Text="{Binding Score, StringFormat='Score: {0}'}"
+            Foreground="White"
+            FontSize="20" />
+
+		<TextBlock
+            Text="{Binding Lives, StringFormat='Lives: {0}'}"
+            Foreground="White"
+            FontSize="20"
+            TextAlignment="Right" />
+		<!--
+		<ItemsControl Items="{Binding Enemies}">
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<Canvas Left="{Binding X}" Top="{Binding Y}">
+					-->
+						<!-- Customize drawing logic here -->
+		<!--
+					</Canvas>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl> 
+		-->
+
+	</StackPanel>
+</UserControl>
