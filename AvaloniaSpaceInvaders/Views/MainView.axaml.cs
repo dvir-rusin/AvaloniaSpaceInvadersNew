@@ -9,5 +9,5 @@ public partial class MainView : UserControl
     {
         InitializeComponent();
     }
-    
+ 
 }

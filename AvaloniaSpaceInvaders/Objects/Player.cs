@@ -1,4 +1,5 @@
-﻿using AvaloniaSpaceInvaders.Objects;
+﻿using Avalonia.Media;
+using AvaloniaSpaceInvaders.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace AvaloniaSpaceInvaders.objects
 
             Width = 40;
             Height = 20;
-            //Paint.Color = SKColors.Blue;
+            Fill = Brushes.Blue;
         }
 
         public void MoveLeft()

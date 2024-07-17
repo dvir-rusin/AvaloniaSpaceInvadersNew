@@ -29,8 +29,9 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         public MainViewModel()
         {
-            WelcomeBtn = new MyCommand(() => UserControlChange());
+            
             CurrentView = new MainView(); // Initialize with the initial view
+            WelcomeBtn = new MyCommand(() => UserControlChange());
         }
 
         public void UserControlChange()

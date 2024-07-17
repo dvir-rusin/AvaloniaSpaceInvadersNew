@@ -1,41 +1,75 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-		xmlns:vm="clr-namespace:AvaloniaSpaceInvaders.ViewModels"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="AvaloniaSpaceInvaders.Views.SecondView"
-		x:DataType="vm:SecondViewModel"
-		Background="Black">
-	
-
-	<Design.DataContext>
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:AvaloniaSpaceInvaders.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="AvaloniaSpaceInvaders.Views.SecondView"
+             x:DataType="vm:SecondViewModel"
+             Background="Black"
+             KeyDown="OnKeyDown">
+	<UserControl.DataContext>
 		<vm:SecondViewModel />
-	</Design.DataContext>
-	<StackPanel>
-		<TextBlock
-            Text="{Binding Score, StringFormat='Score: {0}'}"
-            Foreground="White"
-            FontSize="20" />
-
-		<TextBlock
-            Text="{Binding Lives, StringFormat='Lives: {0}'}"
-            Foreground="White"
-            FontSize="20"
-            TextAlignment="Right" />
-		<!--
-		<ItemsControl Items="{Binding Enemies}">
-			<ItemsControl.ItemTemplate>
-				<DataTemplate>
-					<Canvas Left="{Binding X}" Top="{Binding Y}">
-					-->
-						<!-- Customize drawing logic here -->
-		<!--
-					</Canvas>
-				</DataTemplate>
-			</ItemsControl.ItemTemplate>
-		</ItemsControl> 
-		-->
-
-	</StackPanel>
+	</UserControl.DataContext>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+		<StackPanel Orientation="Horizontal" Grid.Row="0">
+			<TextBlock Text="{Binding Score, StringFormat='Score: {0}'}"
+                       Foreground="White"
+                       FontSize="20"
+                       Margin="10"/>
+			<TextBlock Text="{Binding Lives, StringFormat='Lives: {0}'}"
+                       Foreground="White"
+                       FontSize="20"
+                       Margin="10"
+                       HorizontalAlignment="Right"/>
+		</StackPanel>
+		<Canvas Grid.Row="1">
+			<Rectangle Width="{Binding Player.Width}"
+                       Height="{Binding Player.Height}"
+                       Fill="{Binding Player.Fill}"
+                       Canvas.Left="{Binding Player.X}"
+                       Canvas.Top="{Binding Player.Y}" />
+			<Rectangle Width="{Binding Bullet.Width}"
+                       Height="{Binding Bullet.Height}"
+                       Fill="{Binding Bullet.Fill}"
+                       Canvas.Left="{Binding Bullet.X}"
+                       Canvas.Top="{Binding Bullet.Y}" />
+			<ItemsControl ItemsSource="{Binding Enemies}">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<Canvas />
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<Rectangle Width="{Binding Width}"
+                                   Height="{Binding Height}"
+                                   Fill="{Binding Fill}"
+                                   Canvas.Left="{Binding X}"
+                                   Canvas.Top="{Binding Y}" />
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+			<ItemsControl ItemsSource="{Binding Shields}">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<Canvas />
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<Rectangle Width="{Binding Width}"
+                                   Height="{Binding Height}"
+                                   Fill="{Binding Fill}"
+                                   Canvas.Left="{Binding X}"
+                                   Canvas.Top="{Binding Y}" />
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</Canvas>
+	</Grid>
 </UserControl>

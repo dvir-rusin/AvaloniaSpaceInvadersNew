@@ -45,8 +45,8 @@ namespace AvaloniaSpaceInvaders.Objects
                 {
                     if (damageGrid[i, j] < 3)
                     {
-                        float rectX = X + i * (Width / 4);
-                        float rectY = Y + j * (Height / 3);
+                        int rectX = X + i * (Width / 4);
+                        int rectY = Y + j * (Height / 3);
                         Rect rect = new Rect(rectX, rectY, Width / 4, Height / 3);
                         context.FillRectangle(Fill, rect);
                     }

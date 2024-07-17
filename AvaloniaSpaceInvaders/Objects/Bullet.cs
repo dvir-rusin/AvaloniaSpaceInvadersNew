@@ -29,6 +29,9 @@ namespace AvaloniaSpaceInvaders.Objects
             {
                 Y += deltaY;
             }
+
+
+            
         }
     
 }

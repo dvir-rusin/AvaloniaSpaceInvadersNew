@@ -10,10 +10,11 @@
   <Design.DataContext>
     <!-- This only sets the DataContext for the previewer in an IDE,
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:MainViewModel />
   </Design.DataContext>
 	
-
+<!--
+ <vm:MainViewModel />
+  -->
 	<StackPanel
 		
 				  Background="Black"
@@ -37,7 +38,21 @@
 			</TextBlock>
 
 		</Border>
+		<Button
+				Content="Start Game"
+				Margin="10"
+			   HorizontalAlignment="Center"
+			   Background="Black"
+			   Foreground="Green"
+			   BorderBrush="Green"
+			   BorderThickness="2"
+			   Padding="10,5"
+				x:Name="WelcomBtn"
+				/>
+				
+	</StackPanel>
 
+<!--
 		<StackPanel>
 
 			<Button
@@ -49,11 +64,9 @@
 			   BorderBrush="Green"
 			   BorderThickness="2"
 			   Padding="10,5"
-				x:Name="WelcomBtn"
-				Command="{Binding welcomeBtn}"/>
+				x:Name="WelcomBtn"/>
 
 		</StackPanel>
+-->
 
-
-	</StackPanel>
 </UserControl>
