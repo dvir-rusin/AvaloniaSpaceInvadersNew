@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Input;
 using Avalonia.Media;
 using AvaloniaSpaceInvaders.objects;
 using AvaloniaSpaceInvaders.Objects;
@@ -8,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices.JavaScript;
+
 
 namespace AvaloniaSpaceInvaders.ViewModels;
 
@@ -28,6 +30,7 @@ public class ViewModelBase : ReactiveObject
 
     public ViewModelBase()
     {
+        
         Score = 0;
         Lives = 3;
 
@@ -35,29 +38,42 @@ public class ViewModelBase : ReactiveObject
         Enemies = new ObservableCollection<Enemy>();
         Shields = new ObservableCollection<Shield>();
         Bullet = new Bullet { X = 600, Y = 550, Fill = Brushes.Yellow };
+        
         _bulletActive = false;
 
+        Enemies.Add(new Enemy { X = 500, Y = 600, Width = 60, Height = 20, Fill = Brushes.Red });
         // Example initialization of enemies and shields
         for (int i = 0; i < 5; i++)
         {
-            Enemies.Add(new Enemy { X = i * 50, Y = 50, Width = 30, Height = 20, Fill = Brushes.Red });
+            Enemies.Add(new Enemy { X = i * 50, Y = 50, Width = 60, Height = 20, Fill = Brushes.Red });
         }
 
         for (int i = 0; i < 3; i++)
         {
-            Shields.Add(new Shield { X = i * 200 + 50, Y = 300, Width = 60, Height = 40, Fill = Brushes.Green });
+            Shields.Add(new Shield { X = 200 + 50, Y = i*300, Width = 60, Height = 40, Fill = Brushes.Green });
         }
 
         MoveLeftCommand = ReactiveCommand.Create(MoveLeft);
         MoveRightCommand = ReactiveCommand.Create(MoveRight);
         ShootCommand = ReactiveCommand.Create(Shoot);
 
-        // Setup an observable to move the bullet upwards
-        Observable.Interval(TimeSpan.FromMilliseconds(50))
-                  .Where(_ => Bullet.Y > -Bullet.Height)
-                  .Subscribe(_ => MoveBulletUp());
+        
+
+
+
+
+
 
     }
+    //public void UpdateGame()
+    //{
+    //    while(Lives>0)
+    //    {
+    //        updateAndcheckCollide();
+    //    }
+    //}
+
+
 
     public Player Player
     {
@@ -95,7 +111,7 @@ public class ViewModelBase : ReactiveObject
     }
 
     public ReactiveCommand<Unit, Unit> MoveLeftCommand { get; }
-    public ReactiveCommand<Unit, Unit> MoveRightCommand { get; }
+    public ReactiveCommand<Unit, Unit> MoveRightCommand { get; } 
     public ReactiveCommand<Unit, Unit> ShootCommand { get; }
 
 
@@ -109,29 +125,39 @@ public class ViewModelBase : ReactiveObject
         Player.X += 10; // Adjust the movement speed as needed
     }
 
-    private void Shoot()
+    public void Shoot()
     {
         if (!_bulletActive)
         {
             // Reset bullet position to the player's position
-            Bullet.X = Player.X + Player.Width / 2 - Bullet.Width / 2;
-            Bullet.Y = Player.Y - Bullet.Height;
+            Bullet.X = Player.X;//+ Player.Width / 2 - Bullet.Width / 2;
+            Bullet.Y = Player.Y;// - Bullet.Height;
             _bulletActive = true;
+            // Setup an observable to move the bullet upwards
+            Observable.Interval(TimeSpan.FromMilliseconds(50)).Subscribe(_ => MoveBulletUp());
+
+            //Observable.Interval(TimeSpan.FromMilliseconds(50)).Where(_ => Bullet.Y > -Bullet.Height).Subscribe(_ => MoveBulletUp());
         }
     }
 
     private void MoveBulletUp()
     {
         Bullet.Move(-10); // Adjust the speed as needed
+        updateAndcheckCollide();
 
 
+
+    }
+
+    private void updateAndcheckCollide()
+    {
         foreach (var enemy in Enemies)
         {
             if (Bullet.Intersects(enemy))
             {
-                    // Handle collision (e.g., remove enemy, increase score, deactivate bullet)
+                // Handle collision (e.g., remove enemy, increase score, deactivate bullet)
                 Enemies.Remove(enemy);
-                Score += 10;
+                Score += 40;
                 _bulletActive = false;
                 Bullet.X = -10; // Move bullet off-screen
                 Bullet.Y = -10;
@@ -141,14 +167,14 @@ public class ViewModelBase : ReactiveObject
         // Check for collisions with shields
         foreach (var shield in Shields)
         {
-             if (Bullet.Intersects(shield))
-             {
-                 // Handle collision (e.g., deactivate bullet)
-                 _bulletActive = false;
-                 Bullet.X = -10; // Move bullet off-screen
-                 Bullet.Y = -10;
-                 return;
-             }
+            if (Bullet.Intersects(shield))
+            {
+                // Handle collision (e.g., deactivate bullet)
+                _bulletActive = false;
+                Bullet.X = -10; // Move bullet off-screen
+                Bullet.Y = -10;
+                return;
+            }
         }
         // Check if the bullet goes off-screen
         if (Bullet.Y + Bullet.Height < 0)

@@ -33,6 +33,8 @@ public class SecondViewModel: ViewModelBase
         {
             Shields.Add(new Shield { X = i * 200 + 50, Y = 300, Width = 60, Height = 40, Fill = Brushes.Green });
         }
+
+
     }
 
     public Player Player

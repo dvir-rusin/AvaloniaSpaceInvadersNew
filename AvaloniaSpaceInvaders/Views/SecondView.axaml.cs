@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
 using AvaloniaSpaceInvaders.objects;
+using AvaloniaSpaceInvaders.Objects;
 using AvaloniaSpaceInvaders.ViewModels;
 using System;
 namespace AvaloniaSpaceInvaders.Views
@@ -20,19 +21,22 @@ namespace AvaloniaSpaceInvaders.Views
 
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
+            
             if (DataContext is SecondViewModel viewModel)
             {
                 if (e.Key == Key.A)
                 {
                     viewModel.Player.MoveLeft();
+                    //viewModel.MoveLeftCommand.Execute().Subscribe();
                 }
-                else if (e.Key == Key.D)
+                if (e.Key == Key.D)
                 {
                     viewModel.Player.MoveRight();
+                    //viewModel.MoveRightCommand.Execute().Subscribe();
                 }
-                else if (e.Key == Key.Space)
+                if (e.Key == Key.S)
                 {
-                    viewModel.ShootCommand.Execute();
+                    viewModel.ShootCommand.Execute().Subscribe();
                 }
             }
         }

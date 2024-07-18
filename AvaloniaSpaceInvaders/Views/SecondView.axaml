@@ -33,18 +33,17 @@
                        Fill="{Binding Player.Fill}"
                        Canvas.Left="{Binding Player.X}"
                        Canvas.Top="{Binding Player.Y}" />
+			
 			<Rectangle Width="{Binding Bullet.Width}"
                        Height="{Binding Bullet.Height}"
                        Fill="{Binding Bullet.Fill}"
                        Canvas.Left="{Binding Bullet.X}"
                        Canvas.Top="{Binding Bullet.Y}" />
-			<ItemsControl ItemsSource="{Binding Enemies}">
-				<ItemsControl.ItemsPanel>
-					<ItemsPanelTemplate>
-						<Canvas />
-					</ItemsPanelTemplate>
-				</ItemsControl.ItemsPanel>
-				<ItemsControl.ItemTemplate>
+		</Canvas>
+		<Canvas Grid.Row="2">
+			
+			<ListBox ItemsSource="{Binding Shields}" Margin="100">
+				<ListBox.ItemTemplate>
 					<DataTemplate>
 						<Rectangle Width="{Binding Width}"
                                    Height="{Binding Height}"
@@ -52,15 +51,12 @@
                                    Canvas.Left="{Binding X}"
                                    Canvas.Top="{Binding Y}" />
 					</DataTemplate>
-				</ItemsControl.ItemTemplate>
-			</ItemsControl>
-			<ItemsControl ItemsSource="{Binding Shields}">
-				<ItemsControl.ItemsPanel>
-					<ItemsPanelTemplate>
-						<Canvas />
-					</ItemsPanelTemplate>
-				</ItemsControl.ItemsPanel>
-				<ItemsControl.ItemTemplate>
+				</ListBox.ItemTemplate>
+			</ListBox>
+		</Canvas>
+		<Canvas Grid.Row="2"  >
+			<ListBox ItemsSource="{Binding Enemies}" Margin="40">
+				<ListBox.ItemTemplate>
 					<DataTemplate>
 						<Rectangle Width="{Binding Width}"
                                    Height="{Binding Height}"
@@ -68,8 +64,8 @@
                                    Canvas.Left="{Binding X}"
                                    Canvas.Top="{Binding Y}" />
 					</DataTemplate>
-				</ItemsControl.ItemTemplate>
-			</ItemsControl>
+				</ListBox.ItemTemplate>
+			</ListBox>
 		</Canvas>
 	</Grid>
 </UserControl>

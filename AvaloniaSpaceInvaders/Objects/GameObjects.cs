@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ReactiveUI;
+using System.ComponentModel;
 
 namespace AvaloniaSpaceInvaders.Objects
 {
@@ -47,10 +48,10 @@ namespace AvaloniaSpaceInvaders.Objects
             set => this.RaiseAndSetIfChanged(ref _fill, value);
         }
 
-        public GameObjects()
-        {
-            Fill = Brushes.White;
-        }
+        //public GameObjects()
+        //{
+        //    Fill = Brushes.White;
+        //}
 
 
         public virtual void Draw(DrawingContext context)
