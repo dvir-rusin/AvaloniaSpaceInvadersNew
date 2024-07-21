@@ -13,7 +13,7 @@ public partial class MainWindow : Window
     }
     public void ClickHandler(object sender, RoutedEventArgs args)
     {
-        CurrentView.Content = new SecondView();
+        CurrentView.Content = new GameScreen();
 
     }
 }

@@ -36,7 +36,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         public void UserControlChange()
         {
-            CurrentView = new SecondView();
+            CurrentView = new GameScreen();
         }
     }
 

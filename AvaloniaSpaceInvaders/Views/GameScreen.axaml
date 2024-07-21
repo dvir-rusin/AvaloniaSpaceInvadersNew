@@ -1,0 +1,42 @@
+<!-- Views/GameScreen.axaml -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:AvaloniaSpaceInvaders.ViewModels"
+             x:Class="AvaloniaSpaceInvaders.Views.GameScreen"
+             d:DesignHeight="700"
+             d:DesignWidth="650"
+             mc:Ignorable="d">
+
+	<UserControl.DataContext>
+		<viewModels:GameScreenViewModel />
+	</UserControl.DataContext>
+	<StackPanel Background="White">
+		<ItemsControl ItemsSource="{Binding Actors}">
+			<ItemsControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<Canvas Width="{Binding GameBoardWidth}" Height="{Binding GameBoardHeight}" Background="Black"/>
+				</ItemsPanelTemplate>
+			</ItemsControl.ItemsPanel>
+			<ItemsControl.ItemTemplate>
+				<DataTemplate DataType="viewModels:ActorViewModel">
+					<ContentPresenter Content="{Binding ImageSource}"/>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+			<ItemsControl.Styles>
+				<Style Selector="ContentPresenter">
+					<Setter Property="Canvas.Left" Value="{Binding LocationX}"/>
+					<Setter Property="Canvas.Top" Value="{Binding LocationY}"/>
+				</Style>
+			</ItemsControl.Styles>
+		</ItemsControl>
+		<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+			<Button Background="Orange" Content="Spawn Player" Command="{Binding SpawnPlayerCommand}"/>
+			<Button Background="Orange" Content="Spawn Enemy" Command="{Binding SpawnEnemyCommand}"/>
+			<Button Background="Orange" Content="Spawn Shield" Command="{Binding SpawnShieldCommand}"/>
+			<Button Background="Orange" Content="Spawn Red Space Ship" Command="{Binding SpawnRedSpaceShipCommand}"/>
+			<Button Background="Orange" Content="Spawn Bullet" Command="{Binding SpawnBulletCommand}"/>
+		</StackPanel>
+	</StackPanel>
+</UserControl>
