@@ -17,7 +17,7 @@
 		<ItemsControl ItemsSource="{Binding Actors}">
 			<ItemsControl.ItemsPanel>
 				<ItemsPanelTemplate>
-					<Canvas Name="GameBoard" Width="700" Height="650" Background="White"/>
+					<Canvas Name="GameBoard" Width="{Binding GameBoardWidth}" Height="{Binding GameBoardHeight}" Background="White"/>
 				</ItemsPanelTemplate>
 			</ItemsControl.ItemsPanel>
 			<ItemsControl.ItemTemplate>
@@ -32,12 +32,13 @@
 				</Style>
 			</ItemsControl.Styles>
 		</ItemsControl>
-		<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+		<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Background="Orange">
 			<Button Background="Orange" Content="Spawn Player" Command="{Binding SpawnPlayerCommand}"/>
 			<Button Background="Orange" Content="Spawn Enemy" Command="{Binding SpawnEnemyCommand}"/>
 			<Button Background="Orange" Content="Spawn Shield" Command="{Binding SpawnShieldCommand}"/>
 			<Button Background="Orange" Content="Spawn Red Space Ship" Command="{Binding SpawnRedSpaceShipCommand}"/>
 			<Button Background="Orange" Content="Spawn Bullet" Command="{Binding SpawnBulletCommand}"/>
+			<Button Background="Orange" Content="Spawn Enemy Bullet" Command="{Binding SpawnEnemyBulletCommand}"/>
 		</StackPanel>
 	</StackPanel>
 </UserControl>
