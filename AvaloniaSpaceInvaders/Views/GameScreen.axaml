@@ -7,25 +7,26 @@
              x:Class="AvaloniaSpaceInvaders.Views.GameScreen"
              d:DesignHeight="700"
              d:DesignWidth="650"
-             mc:Ignorable="d">
+             mc:Ignorable="d"
+			 x:CompileBindings="True">
 
 	<UserControl.DataContext>
 		<viewModels:GameScreenViewModel />
 	</UserControl.DataContext>
-	<StackPanel Background="White">
+	<StackPanel Background="White" x:DataType="viewModels:GameScreenViewModel">
 		<ItemsControl ItemsSource="{Binding Actors}">
 			<ItemsControl.ItemsPanel>
 				<ItemsPanelTemplate>
-					<Canvas Width="{Binding GameBoardWidth}" Height="{Binding GameBoardHeight}" Background="Black"/>
+					<Canvas Name="GameBoard" Width="700" Height="650" Background="White"/>
 				</ItemsPanelTemplate>
 			</ItemsControl.ItemsPanel>
 			<ItemsControl.ItemTemplate>
-				<DataTemplate DataType="viewModels:ActorViewModel">
-					<ContentPresenter Content="{Binding ImageSource}"/>
+				<DataTemplate x:DataType="viewModels:ActorViewModel">
+					<ContentPresenter Content="{Binding Source}"/>
 				</DataTemplate>
 			</ItemsControl.ItemTemplate>
 			<ItemsControl.Styles>
-				<Style Selector="ContentPresenter">
+				<Style Selector="ContentPresenter" x:DataType="viewModels:ActorViewModel">
 					<Setter Property="Canvas.Left" Value="{Binding LocationX}"/>
 					<Setter Property="Canvas.Top" Value="{Binding LocationY}"/>
 				</Style>

@@ -27,6 +27,7 @@ namespace AvaloniaSpaceInvaders.objects
         {
             X += 10; // Adjust the movement speed as needed
         }
+        
 
         public void Shoot()
         {

@@ -68,5 +68,6 @@ namespace AvaloniaSpaceInvaders.Objects
                 Y < other.Y + other.Height &&
                 Y + Height > other.Y;
         }
+       
     }
 }

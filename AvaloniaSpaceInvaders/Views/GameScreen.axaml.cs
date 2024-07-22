@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using AvaloniaSpaceInvaders.ViewModels;
 
 namespace AvaloniaSpaceInvaders.Views
@@ -9,5 +10,6 @@ namespace AvaloniaSpaceInvaders.Views
         {
             InitializeComponent();
         }
+       
     }
 }

@@ -22,11 +22,11 @@ namespace AvaloniaSpaceInvaders.Models
 
         public bool IsAlive { get; set; }
 
-        protected Actor(string imagePath, int width, int height)
+        protected Actor(string imagePath, int width, int height,bool isalive)
         {
             Width = width;
             Height = height;
-            IsAlive= true;
+            IsAlive= isalive;
             Image = new Image
             {
                 Width = Width,

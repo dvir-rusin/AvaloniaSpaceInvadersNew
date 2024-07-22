@@ -8,7 +8,15 @@ namespace AvaloniaSpaceInvaders.Models
 {
     public class Player : Actor
     {
-        public Player(string imagePath, int width, int height)
-            : base(imagePath, width, height) { }
+        public int? Direction { get; set; } = null;
+        public int? Speed { get; set; } = null;
+        public bool IsAlive { get; set; } = true;
+        public Player(string imagePath, int width, int height, int direction,int speed,bool isalive)
+            : base(imagePath, width, height,isalive)
+        {
+            IsAlive = isalive;
+            Speed = speed;
+            Direction = direction;
+        }
     }
 }
