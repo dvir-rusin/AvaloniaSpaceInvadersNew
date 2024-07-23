@@ -76,8 +76,8 @@ namespace AvaloniaSpaceInvaders.ViewModels
             _enemiesList.Add(_enemies5);
         }
 
-        public double GameBoardWidth { get; set; } = 700;
-        public double GameBoardHeight { get; set; } = 650;
+        public double GameBoardWidth { get; set; } = 900;
+        public double GameBoardHeight { get; set; } = 700;
 
         private void SpawnPlayer()
         {
@@ -153,17 +153,6 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         }
 
-        private void DeSpawnEnemy()//can change this hole function to be if interact, delete 
-        {
-            foreach (var actor in Actors)
-            {
-                if (actor.GetType() == typeof(EnemyViewModel)&& actor.IsAlive == false)
-                {
-                    Actors.Remove(actor);
-
-                }
-            }
-        }
 
 
         private void SpawnShield()//needs to change the path to be shiled path / only rec with no img
@@ -173,9 +162,11 @@ namespace AvaloniaSpaceInvaders.ViewModels
             for(int i = 0; i < 3; i++)
             {
                 var shield = new ShieldViewModel(relativePathToAssets, 64, 64, 1, 1, true);
+                shield.Source.Opacity = 1;
                 shield.SetPosition(200 * i + 200, 400);
                 Actors.Add(shield);
                 _Shileds.Add(shield);
+
             }
             
         }
@@ -227,14 +218,12 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         private void DeSpawnBullet()
         {
-            foreach (var actor in Actors)
+            if (bullet.LocationY < 0)
             {
-                if (actor.GetType() == typeof(BulletViewModel)&& actor.LocationY<0)
-                {
-                    Actors.Remove(actor);
-
-                }
+                _actors.Remove(bullet);
+                bullet = null;
             }
+                
         }
 
         private void SpawnEnemyBullet()
@@ -254,7 +243,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
                 var enemyBullet = new EnemyBulletViewModel(relativePathToAssets, 64, 64, 1, 1, true);
 
                 //enemyBullet.SetPosition();//random bot selectror location
-                enemyBullet.SetPosition(400, 0);
+                enemyBullet.SetPosition(500, 0);
                 _enemyBullets.Add(enemyBullet);
                 _actors.Add(enemyBullet);
             }
@@ -264,12 +253,12 @@ namespace AvaloniaSpaceInvaders.ViewModels
         {
             foreach (var enemyBullet in _enemyBullets)
             {
-                if (enemyBullet.LocationY>700)
+                if (enemyBullet.LocationY>GameBoardHeight)
                 {
                     _enemyBullets.Remove(enemyBullet);
-                    _enemyBullets.Remove(enemyBullet);
+                    _actors.Remove(enemyBullet);
 
-
+                    return;
                 }
             }
         }
@@ -280,6 +269,15 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         private void GameLoop(object sender, EventArgs e)
         {
+            if (bullet!=null)
+            {
+                DeSpawnBullet();
+            }
+            if(_enemyBullets.Count>0)
+            {
+                DeSpawnEnemyBullet();
+            }
+            
             EnemyViewModel farestEnemy = null;
 
             EnemyViewModel closestEnemy = null;
@@ -304,7 +302,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
             }
             if (farestEnemy != null)
             {
-                if (farestEnemy.LocationX + farestEnemy.Width >= GameBoardWidth+150)//aditional 150 cuz of main window screen
+                if (farestEnemy.LocationX + farestEnemy.Width >= GameBoardWidth)//aditional 150 cuz of main window screen
                 {
 
                     foreach (EnemyViewModel enemy in _enemiesList[0])
@@ -337,7 +335,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
             if (closestEnemy != null)
             {
-                if (closestEnemy.LocationX <=0-150)//-150 cuz of main window screen
+                if (closestEnemy.LocationX <=0)//-150 cuz of main window screen
                 {
 
                     foreach (EnemyViewModel enemy in _enemiesList[0])
@@ -509,7 +507,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
                     }
                 }
             }
-            if(bullet.LocationY== _shields[0].LocationY)
+            if(_shields.Count>0&& bullet.LocationY == _shields[0].LocationY)
             {
                 
                 
@@ -519,10 +517,14 @@ namespace AvaloniaSpaceInvaders.ViewModels
                 {
                      if (bullet.Intersects(shiled))
                      {
-                                
-                            _Shileds.Remove(shiled);
+
+                        shiled.Source.Opacity += 100;
+                        if(shiled.Source.Opacity>1000)
+                        {
                             _actors.Remove(shiled);
-                            _actors.Remove(bullet);
+                            _shields.Remove(shiled);
+                        }
+                        _actors.Remove(bullet);
                             bullet = null;
                                 
                                 return;
@@ -548,8 +550,12 @@ namespace AvaloniaSpaceInvaders.ViewModels
                         {
                             //neede to add opacity shiled changes 
                             //shiled.Source.Transitions.Clear();
-                            _Shileds.Remove(shiled);
-                            _actors.Remove(shiled);
+                            shiled.Source.Opacity += 100;
+                            if (shiled.Source.Opacity > 1000)
+                            {
+                                _actors.Remove(shiled);
+                                _shields.Remove(shiled);
+                            }
                             _enemyBullets.Remove(enemyBullet);
                             _actors.Remove(enemyBullet);
                             return;

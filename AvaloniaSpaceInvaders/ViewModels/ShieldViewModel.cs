@@ -44,5 +44,6 @@ namespace AvaloniaSpaceInvaders.ViewModels
         {
             return new Shield(imagePath, width, height,Direction,Speed,IsAlive);
         }
+        
     }
 }

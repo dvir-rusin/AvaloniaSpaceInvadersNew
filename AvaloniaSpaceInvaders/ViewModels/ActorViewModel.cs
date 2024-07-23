@@ -80,8 +80,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
                 this.RaisePropertyChanged(nameof(IsAlive));
             }
         }
-
-
+        
         public abstract void Move();
 
         public bool Intersects(ActorViewModel other)

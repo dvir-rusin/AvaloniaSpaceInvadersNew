@@ -19,5 +19,6 @@ namespace AvaloniaSpaceInvaders.Models
             Speed = speed;
             Direction = direction;
         }
+        
     }
 }
