@@ -17,7 +17,7 @@
 		<ItemsControl ItemsSource="{Binding Actors}">
 			<ItemsControl.ItemsPanel>
 				<ItemsPanelTemplate>
-					<Canvas Name="GameBoard" Width="{Binding GameBoardWidth}" Height="{Binding GameBoardHeight}" Background="White"/>
+					<Canvas Name="GameBoard" Width="{Binding GameBoardWidth}" Height="{Binding GameBoardHeight}" Background="black"/>
 				</ItemsPanelTemplate>
 			</ItemsControl.ItemsPanel>
 			<ItemsControl.ItemTemplate>

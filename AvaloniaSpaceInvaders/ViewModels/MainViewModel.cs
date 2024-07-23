@@ -5,17 +5,21 @@ using Avalonia.Interactivity;
 using Avalonia.Controls;
 using AvaloniaSpaceInvaders.Views;
 using System;
+using ReactiveUI;
+using System.Data;
+using AvaloniaSpaceInvaders.ViewModels;
 
 namespace AvaloniaSpaceInvaders.ViewModels
 {
     public partial class MainViewModel : INotifyPropertyChanged
     {
-        private Control _currentView;
-        public event PropertyChangedEventHandler? PropertyChanged;
-
         public string Greeting => "Welcome to Avalonia!";
 
-        public ICommand WelcomeBtn { get; }
+
+
+        private Control _currentView;
+        public event PropertyChangedEventHandler? PropertyChanged;
+        public ICommand WelcomeBtnCommand { get; }
 
         public Control CurrentView
         {
@@ -29,9 +33,9 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         public MainViewModel()
         {
-            
             CurrentView = new MainView(); // Initialize with the initial view
-            WelcomeBtn = new MyCommand(() => UserControlChange());
+            WelcomeBtnCommand = ReactiveCommand.Create(UserControlChange);
+
         }
 
         public void UserControlChange()
@@ -40,25 +44,5 @@ namespace AvaloniaSpaceInvaders.ViewModels
         }
     }
 
-    public class MyCommand : ICommand
-    {
-        private readonly Action _execute;
-
-        public MyCommand(Action execute)
-        {
-            _execute = execute;
-        }
-
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object? parameter)
-        {
-            _execute();
-        }
-    }
+   
 }

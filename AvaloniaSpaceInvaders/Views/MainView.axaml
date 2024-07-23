@@ -17,7 +17,7 @@
   -->
 	<StackPanel
 		
-				  Background="Black"
+				  Background="BLACK"
 				  HorizontalAlignment="Center"
 				  VerticalAlignment="Center"
 				  Spacing="10">
@@ -27,7 +27,8 @@
 				CornerRadius="10"
 				BorderBrush="Green"
 				BorderThickness="2"
-				Name="welcomeTxtBorder">
+				Name="welcomeTxtBorder"
+				>
 
 			<TextBlock Name="WelcomeTxt"
 				Margin="10"
@@ -38,17 +39,22 @@
 			</TextBlock>
 
 		</Border>
-		<Button
+		<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Background="darkgreen">
+			<Button
+				
 				Content="Start Game"
 				Margin="10"
 			   HorizontalAlignment="Center"
 			   Background="Black"
 			   Foreground="Green"
-			   BorderBrush="Green"
+			   BorderBrush="green"
 			   BorderThickness="2"
 			   Padding="10,5"
 				x:Name="WelcomBtn"
+				Click="UserControlChange"
 				/>
+		</StackPanel>
+		
 				
 	</StackPanel>
 

@@ -10,5 +10,12 @@ public partial class MainView : UserControl
         InitializeComponent();
         
     }
- 
+
+    public void UserControlChange(object sender, RoutedEventArgs args)
+    {
+        MainWindow window = (MainWindow)this.VisualRoot;
+        window.CurrentView.Content = new GameScreen();
+    }
+
+
 }

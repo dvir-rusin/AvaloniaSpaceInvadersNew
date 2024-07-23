@@ -84,7 +84,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         public abstract void Move();
 
-        public bool Intersects(Actor other)
+        public bool Intersects(ActorViewModel other)
         {
             return LocationX < other.LocationX + other.Width &&
                 LocationX + Width > other.LocationX &&
@@ -98,6 +98,14 @@ namespace AvaloniaSpaceInvaders.ViewModels
                 LocationX + Width > enemy.LocationX &&
                 LocationX < enemy.LocationX + enemy.Height &&
                 LocationX + Height > enemy.LocationX;
+        }
+
+        internal bool Intersects(ShieldViewModel shiled)
+        {
+            return LocationX < shiled.LocationX + shiled.Width &&
+                LocationX + Width > shiled.LocationX &&
+                LocationX < shiled.LocationX + shiled.Height &&
+                LocationX + Height > shiled.LocationX;
         }
     }
 }

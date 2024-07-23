@@ -8,6 +8,7 @@ namespace AvaloniaSpaceInvaders.Models
 {
     public class Shield : Actor
     {
+        
         public int? Direction { get; set; } = null;
         public int? Speed { get; set; } = null;
         public bool IsAlive { get; set; } = true;
