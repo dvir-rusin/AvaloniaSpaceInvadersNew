@@ -42,6 +42,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
         private List<EnemyBulletViewModel> _enemyBullets= new List<EnemyBulletViewModel>();
 
         private List<ShieldViewModel> _Shileds= new List<ShieldViewModel>();
+        private List<ShieldViewModel> _Shileds2 = new List<ShieldViewModel>();
         public ObservableCollection<ActorViewModel> Actors
         {
             get => _actors;
@@ -54,6 +55,8 @@ namespace AvaloniaSpaceInvaders.ViewModels
         public ICommand SpawnRedSpaceShipCommand { get; }
         public ICommand SpawnBulletCommand { get; }
         public ICommand SpawnEnemyBulletCommand { get; }
+        public ICommand MovePlayerLeftCommand { get; }
+        public ICommand MovePlayerRightCommand { get; }
 
         public GameScreenViewModel()
         {
@@ -63,7 +66,10 @@ namespace AvaloniaSpaceInvaders.ViewModels
             SpawnRedSpaceShipCommand = ReactiveCommand.Create(SpawnRedSpaceShip);
             SpawnBulletCommand = ReactiveCommand.Create(SpawnBullet);
             SpawnEnemyBulletCommand = ReactiveCommand.Create(SpawnEnemyBullet);
-
+            MovePlayerLeftCommand = ReactiveCommand.Create(MoveLeft);//player.MoveLeft
+            //player.LocationX = MovePlayerLeftCommand;
+            MovePlayerRightCommand = ReactiveCommand.Create(MoveRight);//player.MoveRight
+            //player.LocationX = MovePlayerRightCommand;
             var gameLoopTimer = new DispatcherTimer();
             gameLoopTimer.Interval = TimeSpan.FromMilliseconds(16.66);
             gameLoopTimer.Tick += GameLoop;
@@ -83,10 +89,20 @@ namespace AvaloniaSpaceInvaders.ViewModels
         {
             string relativePathToAssets2 = "avares://AvaloniaSpaceInvaders/Assets/avalonia-logo.ico";
             string relativePathToAssets = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersPlayer_1.ico";
-            player = new PlayerViewModel(relativePathToAssets, 64, 64,1,1,true);
+            string relativePathToAssets3 = "avares://AvaloniaSpaceInvaders/Assets/avalonia-logo.ico";
+            player = new PlayerViewModel(relativePathToAssets3, 64, 64,1,1,true);
             player.SetPosition(400, 600);
             Actors.Add(player);
         }
+        private void MoveRight()
+        {
+            player.LocationX += 10;
+        }
+        private void MoveLeft()
+        {
+            player.LocationX -= 10;
+        }
+
 
         private void SpawnEnemy()
         {
@@ -157,18 +173,81 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         private void SpawnShield()//needs to change the path to be shiled path / only rec with no img
         {
-            
-            string relativePathToAssets = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersPlayer_1.ico";
-            for(int i = 0; i < 3; i++)
+
+            string relativePathToAssets = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersShiled.png";
+            for (int i = 0; i < 3; i++)
+            {
+                
+                
+                    var shield = new ShieldViewModel(relativePathToAssets, 64, 64, 1, 1, true);
+                    shield.Source.Opacity = 1;
+                    shield.SetPosition(65 * i+50, 400);
+                    Actors.Add(shield);
+                    _Shileds.Add(shield);
+                
+                
+
+            }
+            for (int i=0;i<2;i++)
             {
                 var shield = new ShieldViewModel(relativePathToAssets, 64, 64, 1, 1, true);
                 shield.Source.Opacity = 1;
-                shield.SetPosition(200 * i + 200, 400);
+                shield.SetPosition(130 * i + 50, 430);
+                Actors.Add(shield);
+                _Shileds2.Add(shield);
+            }
+
+
+
+            for (int i = 0; i < 3; i++)
+            {
+
+
+                var shield = new ShieldViewModel(relativePathToAssets, 64, 64, 1, 1, true);
+                shield.Source.Opacity = 1;
+                shield.SetPosition(65 * i + 350, 400);
                 Actors.Add(shield);
                 _Shileds.Add(shield);
 
+
+
             }
-            
+            for (int i = 0; i < 2; i++)
+            {
+                var shield = new ShieldViewModel(relativePathToAssets, 64, 64, 1, 1, true);
+                shield.Source.Opacity = 1;
+                shield.SetPosition(130 * i + 350, 430);
+                Actors.Add(shield);
+                _Shileds2.Add(shield);
+            }
+
+
+
+
+
+            for (int i = 0; i < 3; i++)
+            {
+
+
+                var shield = new ShieldViewModel(relativePathToAssets, 64, 64, 1, 1, true);
+                shield.Source.Opacity = 1;
+                shield.SetPosition(65 * i + 650, 400);
+                Actors.Add(shield);
+                _Shileds.Add(shield);
+
+
+
+            }
+            for (int i = 0; i < 2; i++)
+            {
+                var shield = new ShieldViewModel(relativePathToAssets, 64, 64, 1, 1, true);
+                shield.Source.Opacity = 1;
+                shield.SetPosition(130 * i + 650, 430);
+                Actors.Add(shield);
+                _Shileds2.Add(shield);
+            }
+
+
         }
 
         private void SpawnRedSpaceShip()
@@ -288,11 +367,11 @@ namespace AvaloniaSpaceInvaders.ViewModels
             } 
             if (player!=null&& bullet != null)
             {
-                doesIntersect(_enemiesList, _Shileds);
+                doesIntersect(_enemiesList, _Shileds,_Shileds2);
             }
             if(_Shileds.Count>0 && _enemiesList[0].Count != 0 && _enemiesList[1].Count != 0 && _enemiesList[2].Count != 0 && _enemiesList[3].Count != 0 && _enemiesList[4].Count != 0)
             {
-                doesEnemyBulletIntersect(_enemyBullets, _Shileds);
+                doesEnemyBulletIntersect(_enemyBullets, _Shileds, _Shileds2);
             }
                 
             foreach (var actor in Actors)
@@ -418,9 +497,10 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
 
 
-        private void doesIntersect(List <List<EnemyViewModel>> _enemiesList, List<ShieldViewModel> _shields)//check if bullet Intersect with enemy
+        private void doesIntersect(List <List<EnemyViewModel>> _enemiesList, List<ShieldViewModel> _shields, List<ShieldViewModel> _shields2)//check if bullet Intersect with enemy
         {
-            if (bullet!=null && bullet.LocationY>= _enemiesList[0][0].LocationY && bullet.LocationY <= _enemiesList[0][0].LocationY + _enemiesList[0][0].Height)
+            if (bullet!=null && _enemiesList[0].Count>0
+                && bullet.LocationY>= _enemiesList[0][0].LocationY && bullet.LocationY <= _enemiesList[0][0].LocationY + _enemiesList[0][0].Height)
             {
                 foreach (EnemyViewModel enemy in _enemiesList[0])
                 {
@@ -437,7 +517,8 @@ namespace AvaloniaSpaceInvaders.ViewModels
                 }
             }
 
-            if (bullet != null && bullet.LocationY >= _enemiesList[1][0].LocationY && bullet.LocationY <= _enemiesList[1][0].LocationY + _enemiesList[1][0].Height)
+            if (bullet != null && _enemiesList[1].Count>0  && 
+                bullet.LocationY >= _enemiesList[1][0].LocationY && bullet.LocationY <= _enemiesList[1][0].LocationY + _enemiesList[1][0].Height)
             {
                 foreach (var enemy in _enemiesList[1])
                 {
@@ -454,7 +535,8 @@ namespace AvaloniaSpaceInvaders.ViewModels
                 }
             }
 
-            if (bullet != null && bullet.LocationY >= _enemiesList[2][0].LocationY && bullet.LocationY <= _enemiesList[2][0].LocationY + _enemiesList[2][0].Height)
+            if (bullet != null && _enemiesList[2].Count > 0 
+                && bullet.LocationY >= _enemiesList[2][0].LocationY && bullet.LocationY <= _enemiesList[2][0].LocationY + _enemiesList[2][0].Height)
             {
                 foreach (var enemy in _enemiesList[2])
                 {
@@ -472,7 +554,8 @@ namespace AvaloniaSpaceInvaders.ViewModels
                 }
             }
 
-            if (bullet != null && bullet.LocationY >= _enemiesList[3][0].LocationY && bullet.LocationY <= _enemiesList[3][0].LocationY + _enemiesList[3][0].Height)
+            if (bullet != null && _enemiesList[3].Count > 0 &&
+                bullet.LocationY >= _enemiesList[3][0].LocationY && bullet.LocationY <= _enemiesList[3][0].LocationY + _enemiesList[3][0].Height)
             {
                 foreach (var enemy in _enemiesList[3])
                 {
@@ -490,7 +573,8 @@ namespace AvaloniaSpaceInvaders.ViewModels
                 }
             }
 
-            if (bullet != null && bullet.LocationY >= _enemiesList[4][0].LocationY && bullet.LocationY <= _enemiesList[4][0].LocationY + _enemiesList[4][0].Height)
+            if (bullet != null && _enemiesList[4].Count > 0 
+                && bullet.LocationY >= _enemiesList[4][0].LocationY && bullet.LocationY <= _enemiesList[4][0].LocationY + _enemiesList[4][0].Height)
             {
                 foreach (var enemy in _enemiesList[4])
                 {
@@ -535,10 +619,38 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
             }
 
+            if (_shields2.Count > 0 && bullet.LocationY == _shields2[0].LocationY)
+            {
+
+
+
+
+                foreach (var shiled in _shields2)
+                {
+                    if (bullet.Intersects(shiled))
+                    {
+
+                        shiled.Source.Opacity += 100;
+                        if (shiled.Source.Opacity > 1000)
+                        {
+                            _actors.Remove(shiled);
+                            _shields2.Remove(shiled);
+                        }
+                        _actors.Remove(bullet);
+                        bullet = null;
+
+                        return;
+                    }
+                }
+
+
+
+            }
+
 
         }
 
-        private void doesEnemyBulletIntersect(List<EnemyBulletViewModel> _enemyBullets,List<ShieldViewModel>_shields )
+        private void doesEnemyBulletIntersect(List<EnemyBulletViewModel> _enemyBullets,List<ShieldViewModel>_shields, List<ShieldViewModel> _shields2)
         {
             foreach(var enemyBullet in _enemyBullets)//enemy bullet intersects with a shiled 
             {
@@ -555,6 +667,27 @@ namespace AvaloniaSpaceInvaders.ViewModels
                             {
                                 _actors.Remove(shiled);
                                 _shields.Remove(shiled);
+                            }
+                            _enemyBullets.Remove(enemyBullet);
+                            _actors.Remove(enemyBullet);
+                            return;
+                        }
+                    }
+                }
+
+                if (enemyBullet.LocationY == _shields2[0].LocationY)
+                {
+                    foreach (var shiled in _shields2)
+                    {
+                        if (enemyBullet.Intersects(shiled))
+                        {
+                            //neede to add opacity shiled changes 
+                            //shiled.Source.Transitions.Clear();
+                            shiled.Source.Opacity += 100;
+                            if (shiled.Source.Opacity > 1000)
+                            {
+                                _actors.Remove(shiled);
+                                _shields2.Remove(shiled);
                             }
                             _enemyBullets.Remove(enemyBullet);
                             _actors.Remove(enemyBullet);

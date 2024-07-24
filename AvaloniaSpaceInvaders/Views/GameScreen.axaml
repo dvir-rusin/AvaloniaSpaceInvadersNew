@@ -39,6 +39,9 @@
 			<Button Background="Orange" Content="Spawn Red Space Ship" Command="{Binding SpawnRedSpaceShipCommand}"/>
 			<Button Background="Orange" Content="Spawn Bullet" Command="{Binding SpawnBulletCommand}"/>
 			<Button Background="Orange" Content="Spawn Enemy Bullet" Command="{Binding SpawnEnemyBulletCommand}"/>
+			<Button  Command="{Binding MovePlayerLeftCommand}" HotKey="A"		/>
+			<Button  Command="{Binding MovePlayerRightCommand}" HotKey="D"		/>
+			<Button  Command="{Binding SpawnBulletCommand}" HotKey="Space"		/>
 		</StackPanel>
 	</StackPanel>
 </UserControl>
