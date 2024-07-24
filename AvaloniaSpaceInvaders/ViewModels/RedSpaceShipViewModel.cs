@@ -38,7 +38,14 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         public override void Move()
         {
-            // Implement red spaceship movement logic
+            if(Direction == 1)
+            {
+                LocationX += 10;
+            }
+            else if(Direction == -1) 
+            {
+                LocationX-= 10;
+            }
         }
 
         protected override Actor CreateActor(string imagePath, int width, int height,bool isalive)

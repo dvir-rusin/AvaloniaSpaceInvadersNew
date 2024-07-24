@@ -12,7 +12,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
     public class EnemyViewModel : ActorViewModel
     {
         private int _direction;
-        private int Speed { get; }
+        private int Speed;
         private bool _isAlive;
 
         public int Direction
@@ -27,6 +27,11 @@ namespace AvaloniaSpaceInvaders.ViewModels
             set => this.RaiseAndSetIfChanged(ref _isAlive, value);
         }
 
+        public int SPEED
+        {
+            get => Speed;
+            set => this.RaiseAndSetIfChanged(ref Speed, value);
+        }
         public EnemyViewModel(string imagePath, int width, int height, int direction , int speed,bool isalive) 
             : base(imagePath , width , height,isalive) 
         {

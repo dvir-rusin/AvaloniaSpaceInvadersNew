@@ -25,6 +25,8 @@ namespace AvaloniaSpaceInvaders.ViewModels
             get => _direction;
             set => this.RaiseAndSetIfChanged(ref _direction, value);
         }
+
+        
         public BulletViewModel(string imagePath, int width, int height,int direction,int speed,bool isalive ) 
             : base(imagePath, width, height,isalive) 
         {
