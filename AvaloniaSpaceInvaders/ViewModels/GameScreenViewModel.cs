@@ -17,13 +17,16 @@ using Avalonia.Media;
 using DynamicData;
 using AvaloniaSpaceInvaders.Objects;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using AvaloniaSpaceInvaders.Views;
+using AvaloniaSpaceInvaders.objects;
 
 namespace AvaloniaSpaceInvaders.ViewModels
 {
     public class GameScreenViewModel : ReactiveObject
     {
         public double GameBoardWidth { get; set; } = 900;
-        public double GameBoardHeight { get; set; } = 700;
+        public double GameBoardHeight { get; set; } = 900;
 
         private ObservableCollection<ActorViewModel> _actors = new ObservableCollection<ActorViewModel>();
         public ObservableCollection<ActorViewModel> Actors
@@ -40,8 +43,18 @@ namespace AvaloniaSpaceInvaders.ViewModels
         private List<EnemyViewModel> _enemies5 = new List<EnemyViewModel>();
 
         private int levelSpeed = 1;
-        private int lives = 3;
-        private int score = 0;
+        private int _lives = 3;
+        public int Lives
+        {
+            get => _lives;
+            set => this.RaiseAndSetIfChanged(ref _lives, value);
+        }
+        private int _score = 0;
+        public int Score
+        {
+            get => _score;
+            set => this.RaiseAndSetIfChanged(ref _score, value);
+        }
         private bool GameStarted=false;
         private bool GameWon =false;
         private bool GameLost=false;
@@ -54,8 +67,8 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         private List<ShieldViewModel> _Shileds= new List<ShieldViewModel>();
         private List<ShieldViewModel> _Shileds2 = new List<ShieldViewModel>();
-        
 
+        private int[] direction = { 1, -1 };
         public ICommand SpawnPlayerCommand { get; }
         public ICommand SpawnEnemyCommand { get; }
         public ICommand SpawnShieldCommand { get; }
@@ -65,10 +78,18 @@ namespace AvaloniaSpaceInvaders.ViewModels
         public ICommand MovePlayerLeftCommand { get; }
         public ICommand MovePlayerRightCommand { get; }
 
+
+        private void InitializeEnemies()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                _enemiesList.Add(new List<EnemyViewModel>());
+            }
+        }
         public GameScreenViewModel()
         {
             SpawnPlayerCommand = ReactiveCommand.Create(SpawnPlayer);
-            SpawnEnemyCommand = ReactiveCommand.Create(SpawnEnemy);
+            SpawnEnemyCommand = ReactiveCommand.Create(SpawnEnemies);
             SpawnShieldCommand = ReactiveCommand.Create(SpawnShield);
             SpawnRedSpaceShipCommand = ReactiveCommand.Create(SpawnRedSpaceShip);
             SpawnBulletCommand = ReactiveCommand.Create(SpawnBullet);
@@ -81,11 +102,14 @@ namespace AvaloniaSpaceInvaders.ViewModels
             gameLoopTimer.Tick += GameLoop;
             gameLoopTimer.Start();
 
-            _enemiesList.Add(_enemies1);
-            _enemiesList.Add(_enemies2);
-            _enemiesList.Add(_enemies3);
-            _enemiesList.Add(_enemies4);
-            _enemiesList.Add(_enemies5);
+            InitializeEnemies();//create 5 lists of enemies ^
+                                //|
+
+            // Initialize the timer to spawn the red spaceship every 20 seconds
+            DispatcherTimer redSpaceShipTimer = new DispatcherTimer();
+            redSpaceShipTimer.Interval = TimeSpan.FromSeconds(20);
+            redSpaceShipTimer.Tick += (s, e) => SpawnRedSpaceShip();
+            redSpaceShipTimer.Start();
         }
 
         
@@ -96,7 +120,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
             string relativePathToAssets3 = "avares://AvaloniaSpaceInvaders/Assets/avalonia-logo.ico";
 
             player = new PlayerViewModel(relativePathToAssets3, 64, 64,1, 1, true);
-            player.SetPosition(400, 600);
+            player.SetPosition((GameBoardWidth-player.Width )/2, 580);
             Actors.Add(player);
         }
         private void MoveRight()
@@ -114,50 +138,22 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
 
 
-        private void SpawnEnemy()//spawn enemy
+         private void SpawnEnemies()
         {
-            string relativePathToAssets2 = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersEnemyGreenT.png";
-            string relativePathToAssets = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersEnemy.ico";
-            for (int i=0;i<11;i++)
+            int enemySpacing = 6;
+            int enemyLevel = 1;
+            string relativePathToAssets = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersEnemyGreenT.png";
+
+            for (int i = 0; i < 5; i++)
             {
-                    var enemy = new EnemyViewModel(relativePathToAssets2, 64, 64, 1, levelSpeed, true);
-                    enemy.SetPosition(i * 70, 1 * 64);
+                for (int j = 0; j < 11; j++)
+                {
+                    var enemy = new EnemyViewModel(relativePathToAssets, 64, 64, 1, levelSpeed, true);
+                    enemy.SetPosition(j * enemy.Width + enemySpacing, enemyLevel * enemy.Width);
                     Actors.Add(enemy);
-                    _enemies1.Add(enemy);
-            }
-
-            for (int i = 0; i < 11; i++)
-            {
-                var enemy = new EnemyViewModel(relativePathToAssets2, 64, 64, 1, levelSpeed, true);
-                enemy.SetPosition(i * 70, 2 * 64);
-                Actors.Add(enemy);
-                _enemies2.Add(enemy);
-            }
-
-            for (int i = 0; i < 11; i++)
-            {
-                var enemy = new EnemyViewModel(relativePathToAssets2, 64, 64, 1, levelSpeed, true);
-                enemy.SetPosition(i * 70, 3 * 64);
-                Actors.Add(enemy);
-                _enemies3.Add(enemy);
-            }
-
-            for (int i = 0; i < 11; i++)
-            { 
-                var enemy = new EnemyViewModel(relativePathToAssets2, 64, 64, 1, levelSpeed, true);
-                enemy.SetPosition(i * 70, 4 * 64);
-                Actors.Add(enemy);
-                _enemies4.Add(enemy);
-
-
-            }
-
-            for (int i = 0; i < 11; i++)
-            {
-                var enemy = new EnemyViewModel(relativePathToAssets2, 64, 64, 1, levelSpeed, true);
-                enemy.SetPosition(i * 70, 5 * 64);
-                Actors.Add(enemy);
-                _enemies5.Add(enemy);
+                    _enemiesList[i].Add(enemy);
+                }
+                enemyLevel++;
             }
         }
 
@@ -172,60 +168,51 @@ namespace AvaloniaSpaceInvaders.ViewModels
         private void SpawnShield()
         {
             string relativePathToAssets = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersShiled.png";
-            for (int i = 0; i < 3; i++)
+            int enemypositionY = 50;
+            int COUNTER = 0;
+            for (int i = 0; i < 9; i++)//TOP ROW OF SHILEDS
             {
+                if(i==3)
+                {
+                    enemypositionY = 350;
+                    COUNTER = 0;
+                }
+                if(i==6)
+                {
+                    COUNTER = 0;
+                    enemypositionY = 650;
+                }
                     var shield = new ShieldViewModel(relativePathToAssets, 64, 64, 1, 1, true);
                     shield.Source.Opacity = 1;
-                    shield.SetPosition(65 * i+50, 400);
+                    shield.SetPosition(65 * COUNTER+ enemypositionY, 400);
                     Actors.Add(shield);
                     _Shileds.Add(shield);
-                
+                    COUNTER++;
             }
 
-            for (int i=0;i<2;i++)
+            enemypositionY = 50;
+            COUNTER = 0;
+            for (int i=0;i<6;i++)//bottom row
             {
+                if(i==2)
+                {
+                    enemypositionY = 350;
+                    COUNTER = 0;
+                }
+                if(i==4)
+                {
+                    enemypositionY = 650;
+                    COUNTER = 0;
+                }
                 var shield = new ShieldViewModel(relativePathToAssets, 64, 64, 1, 1, true);
                 shield.Source.Opacity = 1;
-                shield.SetPosition(130 * i + 50, 430);
+                shield.SetPosition(130 * COUNTER + enemypositionY, 430);
                 Actors.Add(shield);
                 _Shileds2.Add(shield);
+                COUNTER++;
             }
 
-            for (int i = 0; i < 3; i++)
-            {
-                var shield = new ShieldViewModel(relativePathToAssets, 64, 64, 1, 1, true);
-                shield.Source.Opacity = 1;
-                shield.SetPosition(65 * i + 350, 400);
-                Actors.Add(shield);
-                _Shileds.Add(shield);
-            }
-
-            for (int i = 0; i < 2; i++)
-            {
-                var shield = new ShieldViewModel(relativePathToAssets, 64, 64, 1, 1, true);
-                shield.Source.Opacity = 1;
-                shield.SetPosition(130 * i + 350, 430);
-                Actors.Add(shield);
-                _Shileds2.Add(shield);
-            }
-
-            for (int i = 0; i < 3; i++)
-            {
-                var shield = new ShieldViewModel(relativePathToAssets, 64, 64, 1, 1, true);
-                shield.Source.Opacity = 1;
-                shield.SetPosition(65 * i + 650, 400);
-                Actors.Add(shield);
-                _Shileds.Add(shield);
-            }
-
-            for (int i = 0; i < 2; i++)
-            {
-                var shield = new ShieldViewModel(relativePathToAssets, 64, 64, 1, 1, true);
-                shield.Source.Opacity = 1;
-                shield.SetPosition(130 * i + 650, 430);
-                Actors.Add(shield);
-                _Shileds2.Add(shield);
-            }
+        
         }
 
 
@@ -233,9 +220,20 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         private void SpawnRedSpaceShip()
         {
+            Random _random= new Random();
+            int randDir = _random.Next(0,1);
+            randDir = direction[randDir];
             string relativePathToAssets = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersRedSpaceShipT.png";
-            redSpaceShip = new RedSpaceShipViewModel(relativePathToAssets, 64, 64,1,1,true);
-            redSpaceShip.SetPosition(0, 0);
+            redSpaceShip = new RedSpaceShipViewModel(relativePathToAssets, 64, 64, randDir, 1,true);
+            if(redSpaceShip.Direction == 1)
+            {
+                redSpaceShip.SetPosition(0, 0);
+            }
+            else
+            {
+                redSpaceShip.SetPosition(GameBoardWidth-redSpaceShip.Width, 0);
+            }
+            
             Actors.Add(redSpaceShip);   
         }
 
@@ -258,32 +256,13 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         private void SpawnBullet()
         {
-            bool doesPlayerExist = false;
+            if (player == null || bullet != null) return;
+
             string relativePathToAssets = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersBullet.ico";
-            foreach (var actor in Actors)
-            {
-                if (bullet!=null)
-                {
-                    return;
-                }
-                if (player!=null)
-                {
-                    doesPlayerExist = true;
-                }
-            }
+            bullet = new BulletViewModel(relativePathToAssets, 32, 32, 1, 1, true);
+            bullet.SetPosition(player.LocationX, player.LocationY);
+            Actors.Add(bullet);
 
-            if(doesPlayerExist == false)
-            {
-                return; 
-            }
-            else
-            {
-                bullet = new BulletViewModel(relativePathToAssets, 32, 32, 1, 1, true);
-
-                bullet.SetPosition(player.LocationX,player.LocationY);
-                Actors.Add(bullet);
-            }
-            
         }
 
 
@@ -301,25 +280,13 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         private void SpawnEnemyBullet()
         {
-            bool enemiesExist = false;
-            string relativePathToAssets = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersBullet.ico";
-            if (_enemiesList[0].Count > 0|| _enemiesList[1].Count > 0|| _enemiesList[2].Count > 0|| _enemiesList[3].Count > 0|| _enemiesList[4].Count > 0)
-            {
-                enemiesExist = true;
-            }
-            if (enemiesExist == false)
-            {
-                return;
-            }
-            else
-            {
-                var enemyBullet = new EnemyBulletViewModel(relativePathToAssets, 32, 32, 1, 1, true);
+            if (_enemiesList.All(row => row.Count == 0)) return;
 
-                //enemyBullet.SetPosition();//random bot selectror location
-                enemyBullet.SetPosition(500, 0);
-                _enemyBullets.Add(enemyBullet);
-                _actors.Add(enemyBullet);
-            }
+            string relativePathToAssets = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersBullet.ico";
+            var enemyBullet = new EnemyBulletViewModel(relativePathToAssets, 32, 32, 1, 1, true);
+            enemyBullet.SetPosition(500, 0); // Randomize the position
+            _enemyBullets.Add(enemyBullet);
+            _actors.Add(enemyBullet);
 
         }
         private void DeSpawnEnemyBullet()
@@ -335,8 +302,27 @@ namespace AvaloniaSpaceInvaders.ViewModels
                 }
             }
         }
+        private void GameWonFunc()
+        {
+            GameWon = false;
+            Lives = 3;
+            levelSpeed += 1;
+            _actors.Clear();
+            SpawnPlayer();
+            SpawnEnemies();
+            SpawnShield();
+        }
 
+        private void GameOverFunc()
+        {
+            //UserControlChange();
+        }
 
+        //public void UserControlChange(object sender, RoutedEventArgs args)
+        //{
+        //    MainWindow window = this.;
+        //    window.CurrentView.Content = new MainView();
+        //}
 
 
 
@@ -347,7 +333,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
             if (GameStarted==false)
             {
                 SpawnPlayer();
-                SpawnEnemy();
+                SpawnEnemies();
                 SpawnShield();
                 GameStarted = true;
             }
@@ -362,21 +348,17 @@ namespace AvaloniaSpaceInvaders.ViewModels
             //restarting game with faster enemies
             if(GameWon==true)
             {
-                GameWon = false;
-                lives = 3;
-                levelSpeed += 1;
-                _actors.Clear();
-                SpawnPlayer();
-                SpawnEnemy();
-                SpawnShield();
+                GameWonFunc();
             }
 
             //game over checking 
-            if(lives<=0)
+            if(Lives <=0)
             {
-                //GameOver();
+                GameOverFunc();
                 //direct to main view screen
             }
+
+
 
             //collision player with boarders----
             if(player.LocationX + player.Width>=GameBoardWidth)
@@ -547,7 +529,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
             return closestEnemy;
         }
 
-
+        private Random _random = new Random();
 
         private void doesIntersect(List <List<EnemyViewModel>> _enemiesList, List<ShieldViewModel> _shields, List<ShieldViewModel> _shields2)//check if player bullet Intersect with anything
         {
@@ -563,7 +545,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
                         _enemiesList[0].Remove(enemy);
                         _actors.Remove(bullet);
                         bullet = null;
-                        score += 40;
+                        Score += _random.Next(40,101);
                         return;
                     }
                 }
@@ -581,7 +563,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
                         _enemiesList[1].Remove(enemy);
                         _actors.Remove(bullet);
                         bullet = null;
-                        score += 40;
+                        Score += _random.Next(40, 101);
                         return;
                     }
                 }
@@ -599,7 +581,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
                         _enemiesList[2].Remove(enemy);
                         _actors.Remove(bullet);
                         bullet = null;
-                        score += 40;
+                        Score += _random.Next(40, 101);
                         return;
 
                     }
@@ -618,7 +600,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
                         _enemiesList[3].Remove(enemy);
                         _actors.Remove(bullet);
                         bullet = null;
-                        score += 40;
+                        Score += _random.Next(40, 101);
                         return;
 
                     }
@@ -637,7 +619,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
                         _enemiesList[4].Remove(enemy);
                         _actors.Remove(bullet);
                         bullet = null;
-                        score += 40;
+                        Score += _random.Next(40, 101);
                         return;
 
                     }
@@ -691,7 +673,71 @@ namespace AvaloniaSpaceInvaders.ViewModels
                 {
                     _actors.Remove(redSpaceShip);
                     redSpaceShip = null;
-                    score += 40;//change the score to be random 
+                    Score += _random.Next(40, 101);//change the score to be random 
+                }
+            }
+
+
+
+            // Check collision between player and enemies
+            if (player != null && _enemiesList[0].Count>0 && player.LocationY == _enemiesList[0][_enemiesList[0].Count-1].LocationY)
+            {
+                foreach(var enemy in _enemiesList[0])
+                {
+                    if (enemy.Intersects(player))
+                    {
+                        Lives = 0;
+                        GameOverFunc();
+                    }
+                }         
+            }
+
+
+            if (player != null && _enemiesList[1].Count > 0 && player.LocationY == _enemiesList[1][_enemiesList[1].Count - 1].LocationY)
+            {
+                foreach (var enemy in _enemiesList[1])
+                {
+                    if (enemy.Intersects(player))
+                    {
+                        Lives = 0;
+                        GameOverFunc();
+                    }
+                }
+            }
+
+            if (player != null && _enemiesList[2].Count > 0 && player.LocationY == _enemiesList[2][_enemiesList[2].Count - 1].LocationY)
+            {
+                foreach (var enemy in _enemiesList[2])
+                {
+                    if (enemy.Intersects(player))
+                    {
+                        Lives = 0;
+                        GameOverFunc();
+                    }
+                }
+            }
+
+            if (player != null && _enemiesList[3].Count > 0 && player.LocationY == _enemiesList[3][_enemiesList[3].Count - 1].LocationY)
+            {
+                foreach (var enemy in _enemiesList[3])
+                {
+                    if (enemy.Intersects(player))
+                    {
+                        Lives = 0;
+                        GameOverFunc();
+                    }
+                }
+            }
+
+            if (player != null && _enemiesList[4].Count > 0 && player.LocationY == _enemiesList[4][_enemiesList[4].Count - 1].LocationY)
+            {
+                foreach (var enemy in _enemiesList[4])
+                {
+                    if (enemy.Intersects(player))
+                    {
+                        Lives = 0;
+                        GameOverFunc();
+                    }
                 }
             }
         }
@@ -750,7 +796,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
                     
                     if (enemyBullet.Intersects(player))
                     {
-                        lives--;
+                        Lives--;
                         _enemyBullets.Remove(enemyBullet);
                         _actors.Remove(enemyBullet);
                         return;

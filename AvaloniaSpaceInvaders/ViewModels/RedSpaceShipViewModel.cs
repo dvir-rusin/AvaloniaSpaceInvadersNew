@@ -40,11 +40,11 @@ namespace AvaloniaSpaceInvaders.ViewModels
         {
             if(Direction == 1)
             {
-                LocationX += 10;
+                LocationX += 3;
             }
             else if(Direction == -1) 
             {
-                LocationX-= 10;
+                LocationX-= 3;
             }
         }
 

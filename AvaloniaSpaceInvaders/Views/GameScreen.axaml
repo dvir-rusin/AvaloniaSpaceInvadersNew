@@ -1,20 +1,26 @@
-<!-- Views/GameScreen.axaml -->
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:AvaloniaSpaceInvaders.ViewModels"
              x:Class="AvaloniaSpaceInvaders.Views.GameScreen"
-             d:DesignHeight="700"
-             d:DesignWidth="650"
+             d:DesignHeight="1000"
+             d:DesignWidth="1000"
              mc:Ignorable="d"
              x:CompileBindings="True">
 
 	<UserControl.DataContext>
 		<viewModels:GameScreenViewModel />
 	</UserControl.DataContext>
-
-	<Grid Background="Black">
+	
+	<Grid>
+		<StackPanel HorizontalAlignment="Center" Background="Black" >
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Background="Black" Margin="0,0,0,10" x:DataType="viewModels:GameScreenViewModel">
+				<TextBlock HorizontalAlignment="Center" Name="ScoreText" Margin="10" Foreground="LimeGreen" FontWeight="Bold" Text="{Binding Score, StringFormat='Score: {0}'}"/>
+				<TextBlock Name="LivesText" Margin="10" Foreground="LimeGreen" FontWeight="Bold" Text="{Binding Lives, StringFormat='Lives: {0}'}"/>
+				<TextBlock Name="HighScore" Margin="10" Foreground="LimeGreen" FontWeight="Bold" Text="{Binding Score, StringFormat='HighScore: {0}'}"/>
+				</StackPanel>
+		
 		<!-- Outer arcade machine border -->
 		<Border BorderBrush="LimeGreen" BorderThickness="10" CornerRadius="15">
 			<StackPanel Background="Black" x:DataType="viewModels:GameScreenViewModel">
@@ -41,25 +47,24 @@
 				</Border>
 
 				<!-- Control Panel -->
-				<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Background="Black" Margin="0,10,0,10">
-					<Button Background="DarkGreen" Foreground="LimeGreen" Content="Spawn Player" Command="{Binding SpawnPlayerCommand}"/>
-					<Button Background="DarkGreen" Foreground="LimeGreen" Content="Spawn Enemy" Command="{Binding SpawnEnemyCommand}"/>
-					<Button Background="DarkGreen" Foreground="LimeGreen" Content="Spawn Shield" Command="{Binding SpawnShieldCommand}"/>
-					<Button Background="DarkGreen" Foreground="LimeGreen" Content="Spawn Red Space Ship" Command="{Binding SpawnRedSpaceShipCommand}"/>
-					<Button Background="DarkGreen" Foreground="LimeGreen" Content="Spawn Bullet" Command="{Binding SpawnBulletCommand}"/>
-					<Button Background="DarkGreen" Foreground="LimeGreen" Content="Spawn Enemy Bullet" Command="{Binding SpawnEnemyBulletCommand}"/>
-					<Button Background="DarkGreen" Foreground="LimeGreen" Content="Move Left (A)" Command="{Binding MovePlayerLeftCommand}" HotKey="A"/>
-					<Button Background="DarkGreen" Foreground="LimeGreen" Content="Move Right (D)" Command="{Binding MovePlayerRightCommand}" HotKey="D"/>
-					<Button Background="DarkGreen" Foreground="LimeGreen" Content="Shoot (Space)" Command="{Binding SpawnBulletCommand}" HotKey="Space"/>
-				</StackPanel>
+				
 
 				<!-- Score Panel -->
-				<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Background="Black">
-					<TextBlock Name="ScoreText" Margin="10" Foreground="LimeGreen" FontWeight="Bold" Text="Score: {Binding Score, StringFormat='{}{0}'}"/>
-					<TextBlock Name="LivesText" Margin="10" Foreground="LimeGreen" FontWeight="Bold" Text="Lives: {Binding Lives, StringFormat='{}{0}'}"/>
-					<TextBlock Name="HighScore" Margin="10" Foreground="LimeGreen" FontWeight="Bold" Text="High Score: {Binding HighScore, StringFormat='{}{0}'}"/>
-				</StackPanel>
+				
+		
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Background="Black" Margin="0,20,0,10" >
+				<Button Background="DarkGreen" Foreground="LimeGreen" Content="Spawn Player" Command="{Binding SpawnPlayerCommand}"/>
+				<Button Background="DarkGreen" Foreground="LimeGreen" Content="Spawn Enemy" Command="{Binding SpawnEnemyCommand}"/>
+				<Button Background="DarkGreen" Foreground="LimeGreen" Content="Spawn Shield" Command="{Binding SpawnShieldCommand}"/>
+				<Button Background="DarkGreen" Foreground="LimeGreen" Content="Spawn Red Space Ship" Command="{Binding SpawnRedSpaceShipCommand}"/>
+				<Button Background="DarkGreen" Foreground="LimeGreen" Content="Spawn Bullet" Command="{Binding SpawnBulletCommand}"/>
+				<Button Background="DarkGreen" Foreground="LimeGreen" Content="Spawn Enemy Bullet" Command="{Binding SpawnEnemyBulletCommand}"/>
+				<Button Background="DarkGreen" Foreground="LimeGreen" Content="Move Left (A)" Command="{Binding MovePlayerLeftCommand}" HotKey="A"/>
+				<Button Background="DarkGreen" Foreground="LimeGreen" Content="Move Right (D)" Command="{Binding MovePlayerRightCommand}" HotKey="D"/>
+				<Button Background="DarkGreen" Foreground="LimeGreen" Content="Shoot (Space)" Command="{Binding SpawnBulletCommand}" HotKey="Space"/>
 			</StackPanel>
+					</StackPanel>
 		</Border>
+		</StackPanel>
 	</Grid>
 </UserControl>
