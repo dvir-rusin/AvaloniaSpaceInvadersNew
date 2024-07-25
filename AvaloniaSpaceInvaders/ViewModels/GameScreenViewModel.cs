@@ -116,46 +116,46 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         private void SpawnEnemy()//spawn enemy
         {
+            string relativePathToAssets2 = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersEnemyGreenT.png";
             string relativePathToAssets = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersEnemy.ico";
             for (int i=0;i<11;i++)
             {
-                    var enemy = new EnemyViewModel(relativePathToAssets, 64, 64, 1, levelSpeed, true);
-                    enemy.SetPosition(i * 64, 1 * 64);
+                    var enemy = new EnemyViewModel(relativePathToAssets2, 64, 64, 1, levelSpeed, true);
+                    enemy.SetPosition(i * 70, 1 * 64);
                     Actors.Add(enemy);
                     _enemies1.Add(enemy);
             }
 
             for (int i = 0; i < 11; i++)
             {
-                var enemy = new EnemyViewModel(relativePathToAssets, 64, 64, 1, levelSpeed, true);
-                enemy.SetPosition(i * 64, 2 * 64);
+                var enemy = new EnemyViewModel(relativePathToAssets2, 64, 64, 1, levelSpeed, true);
+                enemy.SetPosition(i * 70, 2 * 64);
                 Actors.Add(enemy);
                 _enemies2.Add(enemy);
             }
 
             for (int i = 0; i < 11; i++)
             {
-                var enemy = new EnemyViewModel(relativePathToAssets, 64, 64, 1, levelSpeed, true);
-                enemy.SetPosition(i * 64, 3 * 64);
+                var enemy = new EnemyViewModel(relativePathToAssets2, 64, 64, 1, levelSpeed, true);
+                enemy.SetPosition(i * 70, 3 * 64);
                 Actors.Add(enemy);
                 _enemies3.Add(enemy);
             }
 
             for (int i = 0; i < 11; i++)
             { 
-                var enemy = new EnemyViewModel(relativePathToAssets, 64, 64, 1, levelSpeed, true);
-                enemy.SetPosition(i * 64, 4 * 64);
+                var enemy = new EnemyViewModel(relativePathToAssets2, 64, 64, 1, levelSpeed, true);
+                enemy.SetPosition(i * 70, 4 * 64);
                 Actors.Add(enemy);
                 _enemies4.Add(enemy);
-
 
 
             }
 
             for (int i = 0; i < 11; i++)
             {
-                var enemy = new EnemyViewModel(relativePathToAssets, 64, 64, 1, levelSpeed, true);
-                enemy.SetPosition(i * 64, 5 * 64);
+                var enemy = new EnemyViewModel(relativePathToAssets2, 64, 64, 1, levelSpeed, true);
+                enemy.SetPosition(i * 70, 5 * 64);
                 Actors.Add(enemy);
                 _enemies5.Add(enemy);
             }
@@ -233,7 +233,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         private void SpawnRedSpaceShip()
         {
-            string relativePathToAssets = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersRedSpaceShip.ico";
+            string relativePathToAssets = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersRedSpaceShipT.png";
             redSpaceShip = new RedSpaceShipViewModel(relativePathToAssets, 64, 64,1,1,true);
             redSpaceShip.SetPosition(0, 0);
             Actors.Add(redSpaceShip);   
@@ -278,7 +278,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
             }
             else
             {
-                bullet = new BulletViewModel(relativePathToAssets, 64, 64, 1, 1, true);
+                bullet = new BulletViewModel(relativePathToAssets, 32, 32, 1, 1, true);
 
                 bullet.SetPosition(player.LocationX,player.LocationY);
                 Actors.Add(bullet);
@@ -313,7 +313,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
             }
             else
             {
-                var enemyBullet = new EnemyBulletViewModel(relativePathToAssets, 64, 64, 1, 1, true);
+                var enemyBullet = new EnemyBulletViewModel(relativePathToAssets, 32, 32, 1, 1, true);
 
                 //enemyBullet.SetPosition();//random bot selectror location
                 enemyBullet.SetPosition(500, 0);
@@ -342,8 +342,9 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         private void GameLoop(object sender, EventArgs e)
         {
+            
             //initalizing the game 
-            if(GameStarted==false)
+            if (GameStarted==false)
             {
                 SpawnPlayer();
                 SpawnEnemy();
@@ -535,13 +536,13 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
             EnemyViewModel closestEnemy = enemy1;
 
-            if (enemy2.LocationX < closestEnemy.LocationX)
+            if (enemy2.LocationX <= closestEnemy.LocationX)
                 closestEnemy = enemy2;
-            if (enemy3.LocationX < closestEnemy.LocationX)
+            if (enemy3.LocationX <= closestEnemy.LocationX)
                 closestEnemy = enemy3;
-            if (enemy4.LocationX < closestEnemy.LocationX)
+            if (enemy4.LocationX <= closestEnemy.LocationX)
                 closestEnemy = enemy4;
-            if (enemy5.LocationX < closestEnemy.LocationX)
+            if (enemy5.LocationX <= closestEnemy.LocationX)
                 closestEnemy = enemy5;
             return closestEnemy;
         }

@@ -6,73 +6,30 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="AvaloniaSpaceInvaders.Views.MainView"
              x:DataType="vm:MainViewModel"
-			 Background="Black">
-  <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-  </Design.DataContext>
-	
-<!--
- <vm:MainViewModel />
-  -->
-	<StackPanel
-		
-				  Background="BLACK"
-				  HorizontalAlignment="Center"
-				  VerticalAlignment="Center"
-				  Spacing="10">
+             Background="Black">
+	<Design.DataContext>
+		<!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+	</Design.DataContext>
 
-		<Border
-				Margin="40"
-				CornerRadius="10"
-				BorderBrush="Green"
-				BorderThickness="2"
-				Name="welcomeTxtBorder"
-				>
-
-			<TextBlock Name="WelcomeTxt"
-				Margin="10"
-				FontSize="20"
-				Foreground="Green"
-				HorizontalAlignment="Center"
-				Text="Welcome to Space Invaders!">
-			</TextBlock>
-
+	<StackPanel Background="Black" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20">
+		<!-- Welcome Text -->
+		<Border Margin="20" CornerRadius="10" BorderBrush="LimeGreen" BorderThickness="3">
+			<TextBlock Name="WelcomeTxt" Margin="20" FontSize="28" FontWeight="Bold" Foreground="LimeGreen" HorizontalAlignment="Center" Text="Welcome to Space Invaders!"/>
 		</Border>
-		<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Background="darkgreen">
-			<Button
-				
-				Content="Start Game"
-				Margin="10"
-			   HorizontalAlignment="Center"
-			   Background="Black"
-			   Foreground="Green"
-			   BorderBrush="green"
-			   BorderThickness="2"
-			   Padding="10,5"
-				x:Name="WelcomBtn"
-				Click="UserControlChange"
-				/>
-		</StackPanel>
-		
-				
+
+		<!-- Start Game Button -->
+		<Button Content="Start Game" Margin="20" Padding="15,10" Background="Black" Foreground="LimeGreen" BorderBrush="LimeGreen" BorderThickness="3" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" Click="UserControlChange"/>
+
+		<!-- High Score Display -->
+
+		<!--
+		<Border Margin="20" CornerRadius="10" BorderBrush="LimeGreen" BorderThickness="3">
+			<StackPanel Background="Black" Padding="20" HorizontalAlignment="Center">
+				<TextBlock Name="HighScoreLabel" FontSize="18" FontWeight="Bold" Foreground="LimeGreen" Text="High Score:"/>
+				<TextBlock Name="HighScoreValue" FontSize="18" FontWeight="Bold" Foreground="LimeGreen" Text="{Binding HighScore, StringFormat='{}{0}'}"/>
+			</StackPanel>
+		</Border>
+		-->
 	</StackPanel>
-
-<!--
-		<StackPanel>
-
-			<Button
-				Content="Start Game"
-				Margin="10"
-			   HorizontalAlignment="Center"
-			   Background="Black"
-			   Foreground="Green"
-			   BorderBrush="Green"
-			   BorderThickness="2"
-			   Padding="10,5"
-				x:Name="WelcomBtn"/>
-
-		</StackPanel>
--->
-
 </UserControl>

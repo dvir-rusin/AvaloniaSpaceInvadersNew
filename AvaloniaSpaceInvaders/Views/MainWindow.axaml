@@ -7,15 +7,33 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="AvaloniaSpaceInvaders.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Title="AvaloniaSpaceInvaders">
+        Title="AvaloniaSpaceInvaders"
+        Background="Black">
 
 	<Grid>
-		<ContentControl Name="CurrentView"/>
-		<Panel Name="Stack" Background="Purple" VerticalAlignment="Bottom">
-			<TextBlock  HorizontalAlignment="Center" Text="avalonia"></TextBlock>
-			<Button Click="ClickHandler" Name="ChangeView" HorizontalAlignment="Right">Change View</Button>
-		</Panel>
+		<!-- Main content area -->
+		<ContentControl Name="CurrentView" Background="Black"/>
+
+		<!-- Bottom panel with controls -->
+		<Border BorderBrush="LimeGreen" BorderThickness="3" Background="Black" VerticalAlignment="Bottom" Margin="10">
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+				<!-- Joystick representation -->
+				<StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+					<Ellipse Width="30" Height="30" Fill="Red" HorizontalAlignment="Center"/>
+					<Rectangle Width="10" Height="50" Fill="Silver" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+				</StackPanel>
+
+				<!-- Text and Button -->
+				<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="LimeGreen" FontSize="14" FontWeight="Bold" Text="AvaloniaSpaceInvaders"/>
+				<Button Click="ClickHandler" Name="ChangeView" Background="Black" Foreground="LimeGreen" BorderBrush="LimeGreen" BorderThickness="2" Margin="20,0,0,0">Change View</Button>
+
+				<!-- Arcade buttons -->
+				<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+					<Ellipse Width="30" Height="30" Fill="Blue" HorizontalAlignment="Center"/>
+					<Ellipse Width="30" Height="30" Fill="Yellow" HorizontalAlignment="Center"/>
+					<Ellipse Width="30" Height="30" Fill="Green" HorizontalAlignment="Center"/>
+				</StackPanel>
+			</StackPanel>
+		</Border>
 	</Grid>
-        
-	
 </Window>

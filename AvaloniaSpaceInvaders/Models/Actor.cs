@@ -31,8 +31,10 @@ namespace AvaloniaSpaceInvaders.Models
             {
                 Width = Width,
                 Height = Height,
-                Source = new Bitmap(AssetLoader.Open(new Uri(imagePath))) // Adjust image loading as needed
+                Source = new Bitmap(AssetLoader.Open(new Uri(imagePath)))
+                // Adjust image loading as needed
             };
+            
         }
     }
 }
