@@ -18,7 +18,7 @@
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Background="Black" Margin="0,0,0,10" x:DataType="viewModels:GameScreenViewModel">
 				<TextBlock HorizontalAlignment="Center" Name="ScoreText" Margin="10" Foreground="LimeGreen" FontWeight="Bold" Text="{Binding Score, StringFormat='Score: {0}'}"/>
 				<TextBlock Name="LivesText" Margin="10" Foreground="LimeGreen" FontWeight="Bold" Text="{Binding Lives, StringFormat='Lives: {0}'}"/>
-				<TextBlock Name="HighScore" Margin="10" Foreground="LimeGreen" FontWeight="Bold" Text="{Binding Score, StringFormat='HighScore: {0}'}"/>
+				<TextBlock Name="HighScore" Margin="10" Foreground="LimeGreen" FontWeight="Bold" Text="{Binding HighScore, StringFormat='HighScore: {0}'}"/>
 				</StackPanel>
 		
 		<!-- Outer arcade machine border -->

@@ -20,6 +20,8 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using AvaloniaSpaceInvaders.Views;
 using AvaloniaSpaceInvaders.objects;
+using System.Text.Json;
+using System.IO;
 
 namespace AvaloniaSpaceInvaders.ViewModels
 {
@@ -55,6 +57,14 @@ namespace AvaloniaSpaceInvaders.ViewModels
             get => _score;
             set => this.RaiseAndSetIfChanged(ref _score, value);
         }
+
+        private int _HighScore = 0;
+        public int HighScore
+        {
+            get => _HighScore;
+            set => this.RaiseAndSetIfChanged(ref _HighScore, value);
+        }
+        private const string HighScoreFilePath = "highscore.json";
         private bool GameStarted=false;
         private bool GameWon =false;
         private bool GameLost=false;
@@ -103,13 +113,23 @@ namespace AvaloniaSpaceInvaders.ViewModels
             gameLoopTimer.Start();
 
             InitializeEnemies();//create 5 lists of enemies ^
-                                //|
+            LoadHighScore();
+            SpawnPlayer();
+            SpawnEnemies();
+            SpawnShield();
+
 
             // Initialize the timer to spawn the red spaceship every 20 seconds
             DispatcherTimer redSpaceShipTimer = new DispatcherTimer();
             redSpaceShipTimer.Interval = TimeSpan.FromSeconds(20);
             redSpaceShipTimer.Tick += (s, e) => SpawnRedSpaceShip();
             redSpaceShipTimer.Start();
+
+            // Timer for spawning enemy bullets every 5 seconds
+            DispatcherTimer enemyBulletTimer = new DispatcherTimer();
+            enemyBulletTimer.Interval = TimeSpan.FromSeconds(5);
+            enemyBulletTimer.Tick += (s, e) => SpawnEnemyBullet();
+            enemyBulletTimer.Start();
         }
 
         
@@ -247,7 +267,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
             }
             else if (redSpaceShip.LocationX<0)
             {
-                _actors.Add(redSpaceShip);
+                _actors.Remove(redSpaceShip);
                 redSpaceShip = null;
             }
         }
@@ -270,7 +290,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         private void DeSpawnBullet()
         {
-            if (bullet.LocationY < 0)
+            if (bullet!=null && bullet.LocationY < 0)
             {
                 _actors.Remove(bullet);
                 bullet = null;
@@ -311,12 +331,19 @@ namespace AvaloniaSpaceInvaders.ViewModels
             SpawnPlayer();
             SpawnEnemies();
             SpawnShield();
+            SpawnRedSpaceShip();
         }
 
         private void GameOverFunc()
         {
+            if (Score >= HighScore)
+            {
+                HighScore = Score;
+                SaveHighScore();
+            }
             //UserControlChange();
         }
+
 
         //public void UserControlChange(object sender, RoutedEventArgs args)
         //{
@@ -324,40 +351,51 @@ namespace AvaloniaSpaceInvaders.ViewModels
         //    window.CurrentView.Content = new MainView();
         //}
 
+        private void LoadHighScore()
+        {
+            try
+            {
+                if (File.Exists(HighScoreFilePath))
+                {
+                    var highScoreJson = File.ReadAllText(HighScoreFilePath);
+                    var highScoreData = JsonSerializer.Deserialize<HighScoreModel>(highScoreJson);
+                    HighScore = highScoreData?.HighScore ?? 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions, e.g., logging
+                HighScore = 0;
+            }
+        }
+
+        private void SaveHighScore()
+        {
+            try
+            {
+                var highScoreData = new HighScoreModel { HighScore = HighScore };
+                var highScoreJson = JsonSerializer.Serialize(highScoreData);
+                File.WriteAllText(HighScoreFilePath, highScoreJson);
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions, e.g., logging
+            }
+        }
+
 
 
         private void GameLoop(object sender, EventArgs e)
         {
+
+            // moving all the actor with their own implementation
+            foreach (var actor in Actors)
+            {
+                actor.Move();
+
+            }
+
             
-            //initalizing the game 
-            if (GameStarted==false)
-            {
-                SpawnPlayer();
-                SpawnEnemies();
-                SpawnShield();
-                GameStarted = true;
-            }
-
-
-            //checking if player won the game 
-            if ((_enemiesList[0].Count==0 && _enemiesList[1].Count == 0 && _enemiesList[2].Count == 0 
-                && _enemiesList[3].Count == 0 && _enemiesList[4].Count == 0))
-            {
-                GameWon = true;
-            }
-            //restarting game with faster enemies
-            if(GameWon==true)
-            {
-                GameWonFunc();
-            }
-
-            //game over checking 
-            if(Lives <=0)
-            {
-                GameOverFunc();
-                //direct to main view screen
-            }
-
 
 
             //collision player with boarders----
@@ -388,29 +426,36 @@ namespace AvaloniaSpaceInvaders.ViewModels
             }
             
             EnemyViewModel farestEnemy = null;
-
             EnemyViewModel closestEnemy = null;
-            if (_enemiesList[0].Count!=0 && _enemiesList[1].Count!=0 && _enemiesList[2].Count!=0&& _enemiesList[3].Count!=0&& _enemiesList[4].Count!=0)
-            {
-                closestEnemy = getClosestEnemy();
-                farestEnemy = getFarestEnemy();
-            } 
+
+            
+
+
+
+
             // checking for player bullet collision 
             if (player!=null&& bullet != null)
             {
                 doesIntersect(_enemiesList, _Shileds,_Shileds2);
             }
+
+
+
             //checking for enemy bullet collision
             if(_Shileds.Count>0 && _enemiesList[0].Count != 0 && _enemiesList[1].Count != 0 && _enemiesList[2].Count != 0 && _enemiesList[3].Count != 0 && _enemiesList[4].Count != 0)
             {
                 doesEnemyBulletIntersect(_enemyBullets, _Shileds, _Shileds2);
             }
-            // moving all the actor with their own implementation
-            foreach (var actor in Actors)
+
+
+
+
+            if (_enemiesList[0].Count != 0 && _enemiesList[1].Count != 0 && _enemiesList[2].Count != 0 && _enemiesList[3].Count != 0 && _enemiesList[4].Count != 0)
             {
-                actor.Move();
-                
+                closestEnemy = getClosestEnemy();
+                farestEnemy = getFarestEnemy();
             }
+
             //enemies movement functionality( if enemies hit the right wall)
             if (farestEnemy != null)
             {
@@ -479,8 +524,27 @@ namespace AvaloniaSpaceInvaders.ViewModels
                 }
             }
 
+            //checking if player won the game 
+            if ((_enemiesList[0].Count == 0 && _enemiesList[1].Count == 0 && _enemiesList[2].Count == 0
+                && _enemiesList[3].Count == 0 && _enemiesList[4].Count == 0))
+            {
+                GameWon = true;
+                GameWonFunc();
+            }
+
+            //game over checking 
+            if (Lives <= 0)
+            {
+                GameOverFunc();
+                //direct to main view screen
+            }
+
 
         }
+
+
+
+
         //function for reciving the closest enemy to right wall
         private EnemyViewModel getFarestEnemy()
         {
@@ -506,7 +570,6 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         }
 
-
         //function for reciving the closest enemy to right wall
         private EnemyViewModel getClosestEnemy()
         {
@@ -528,6 +591,10 @@ namespace AvaloniaSpaceInvaders.ViewModels
                 closestEnemy = enemy5;
             return closestEnemy;
         }
+
+
+
+
 
         private Random _random = new Random();
 
