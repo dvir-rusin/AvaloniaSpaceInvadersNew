@@ -18,6 +18,7 @@ namespace AvaloniaSpaceInvaders.Models
             IsAlive = isalive;
             Speed = speed;
             Direction = direction;
+            
         }
     }
 }

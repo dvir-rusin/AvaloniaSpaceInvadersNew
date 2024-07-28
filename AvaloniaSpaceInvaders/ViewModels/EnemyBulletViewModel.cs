@@ -11,8 +11,15 @@ namespace AvaloniaSpaceInvaders.ViewModels
     public class EnemyBulletViewModel : ActorViewModel
     {
         private int _direction;
+        private int _id;
         private int Speed { get; }
         private bool _isAlive;
+
+        public int Id
+        {
+            get => _id;
+            set => this.RaiseAndSetIfChanged(ref _id, value);
+        }
 
         public bool IsAlive
         {
@@ -25,13 +32,13 @@ namespace AvaloniaSpaceInvaders.ViewModels
             get => _direction;
             set => this.RaiseAndSetIfChanged(ref _direction, value);
         }
-        public EnemyBulletViewModel(string imagePath, int width, int height, int direction, int speed, bool isalive)
+        public EnemyBulletViewModel(string imagePath, int width, int height, int direction, int speed, bool isalive,int id)
             : base(imagePath, width, height, isalive)
         {
             IsAlive = isalive;
             _direction = direction;
             Speed = speed;
-
+            Id= id;
         }
 
         public override void Move()
@@ -42,7 +49,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         protected override Actor CreateActor(string imagePath, int width, int height, bool isalive)
         {
-            return new Bullet(imagePath, width, height, Direction, Speed, IsAlive);
+            return new EnemyBullet(imagePath, width, height, Direction, Speed, IsAlive,Id);
         }
     }
 }

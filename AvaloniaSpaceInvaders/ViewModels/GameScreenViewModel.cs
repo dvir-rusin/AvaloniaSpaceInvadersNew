@@ -27,8 +27,8 @@ namespace AvaloniaSpaceInvaders.ViewModels
 {
     public class GameScreenViewModel : ReactiveObject
     {
-        public double GameBoardWidth { get; set; } = 900;
-        public double GameBoardHeight { get; set; } = 900;
+        public int GameBoardWidth { get; set; } = 1000;
+        public int GameBoardHeight { get; set; } = 900;
 
         private ObservableCollection<ActorViewModel> _actors = new ObservableCollection<ActorViewModel>();
         public ObservableCollection<ActorViewModel> Actors
@@ -64,10 +64,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
             get => _HighScore;
             set => this.RaiseAndSetIfChanged(ref _HighScore, value);
         }
-        private const string HighScoreFilePath = "highscore.json";
-        private bool GameStarted=false;
-        private bool GameWon =false;
-        private bool GameLost=false;
+        private const string HighScoreFilePath = "highscore.json";//FILE to save high score
 
         private BulletViewModel bullet = null;
         private PlayerViewModel player=null;
@@ -78,7 +75,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
         private List<ShieldViewModel> _Shileds= new List<ShieldViewModel>();
         private List<ShieldViewModel> _Shileds2 = new List<ShieldViewModel>();
 
-        private int[] direction = { 1, -1 };
+        private int[] direction = { 1, -1 } ;
         public ICommand SpawnPlayerCommand { get; }
         public ICommand SpawnEnemyCommand { get; }
         public ICommand SpawnShieldCommand { get; }
@@ -89,7 +86,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
         public ICommand MovePlayerRightCommand { get; }
 
 
-        private void InitializeEnemies()
+        private void InitializeEnemies()//InitializeEnemies
         {
             for (int i = 0; i < 5; i++)
             {
@@ -112,42 +109,42 @@ namespace AvaloniaSpaceInvaders.ViewModels
             gameLoopTimer.Tick += GameLoop;
             gameLoopTimer.Start();
 
-            InitializeEnemies();//create 5 lists of enemies ^
-            LoadHighScore();
-            SpawnPlayer();
-            SpawnEnemies();
-            SpawnShield();
+            InitializeEnemies();//create 5 lists of enemies 
+            LoadHighScore();//LoadHighScore
+            SpawnPlayer();//SpawnPlayer
+            SpawnEnemies();//SpawnEnemies
+            SpawnShield();//SpawnShield
 
 
-            // Initialize the timer to spawn the red spaceship every 20 seconds
+            // Initialize the timer to spawn the red spaceship every 15 seconds
             DispatcherTimer redSpaceShipTimer = new DispatcherTimer();
-            redSpaceShipTimer.Interval = TimeSpan.FromSeconds(20);
+            redSpaceShipTimer.Interval = TimeSpan.FromSeconds(15);
             redSpaceShipTimer.Tick += (s, e) => SpawnRedSpaceShip();
             redSpaceShipTimer.Start();
 
-            // Timer for spawning enemy bullets every 5 seconds
+            // Timer for spawning enemy bullets every 3 seconds
             DispatcherTimer enemyBulletTimer = new DispatcherTimer();
-            enemyBulletTimer.Interval = TimeSpan.FromSeconds(5);
+            enemyBulletTimer.Interval = TimeSpan.FromSeconds(3);
             enemyBulletTimer.Tick += (s, e) => SpawnEnemyBullet();
             enemyBulletTimer.Start();
         }
 
         
-        private void SpawnPlayer()//spawn player
+        private void SpawnPlayer()//spawn player, creates, sets pos and adds to actors(the way to see on screen)
         {
             string relativePathToAssets2 = "avares://AvaloniaSpaceInvaders/Assets/avalonia-logo.ico";
             string relativePathToAssets = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersPlayer_1.ico";
             string relativePathToAssets3 = "avares://AvaloniaSpaceInvaders/Assets/avalonia-logo.ico";
 
             player = new PlayerViewModel(relativePathToAssets3, 64, 64,1, 1, true);
-            player.SetPosition((GameBoardWidth-player.Width )/2, 580);
+            player.SetPosition((GameBoardWidth-player.Width )/2, 550);
             Actors.Add(player);
         }
-        private void MoveRight()
+        private void MoveRight()//player move right 
         {
             player.LocationX += 10;
         }
-        private void MoveLeft()
+        private void MoveLeft()//player move left
         {
             player.LocationX -= 10;
         }
@@ -158,7 +155,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
 
 
-         private void SpawnEnemies()
+        private void SpawnEnemies()//SpawnEnemies 5*11,creates ,sets pos and adds to actors(the way to see on screen)
         {
             int enemySpacing = 6;
             int enemyLevel = 1;
@@ -168,14 +165,26 @@ namespace AvaloniaSpaceInvaders.ViewModels
             {
                 for (int j = 0; j < 11; j++)
                 {
-                    var enemy = new EnemyViewModel(relativePathToAssets, 64, 64, 1, levelSpeed, true);
+                    
+                    var enemy = new EnemyViewModel(relativePathToAssets, 64, 64, 1, levelSpeed, false,-1);
+
                     enemy.SetPosition(j * enemy.Width + enemySpacing, enemyLevel * enemy.Width);
                     Actors.Add(enemy);
                     _enemiesList[i].Add(enemy);
                 }
                 enemyLevel++;
             }
+            setId();
         }
+
+        private void setId()//sets the id for enemies and enemy bullets, a way to connect the two
+        {
+            for(int i = 0; i < _enemiesList[0].Count-1;i++)
+            {
+                _enemiesList[0][i].Id = i;
+            }
+        }
+
 
 
 
@@ -188,45 +197,51 @@ namespace AvaloniaSpaceInvaders.ViewModels
         private void SpawnShield()
         {
             string relativePathToAssets = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersShiled.png";
-            int enemypositionY = 50;
+
+            //TOP ROW OF SHILEDS
+            int enemypositionX = 100;
             int COUNTER = 0;
-            for (int i = 0; i < 9; i++)//TOP ROW OF SHILEDS
+            for (int i = 0; i < 9; i++)
             {
                 if(i==3)
                 {
-                    enemypositionY = 350;
+                    enemypositionX = 400;
                     COUNTER = 0;
                 }
                 if(i==6)
                 {
                     COUNTER = 0;
-                    enemypositionY = 650;
+                    enemypositionX = 700;
                 }
                     var shield = new ShieldViewModel(relativePathToAssets, 64, 64, 1, 1, true);
                     shield.Source.Opacity = 1;
-                    shield.SetPosition(65 * COUNTER+ enemypositionY, 400);
+                    shield.SetPosition(65 * COUNTER+ enemypositionX, 400);
                     Actors.Add(shield);
                     _Shileds.Add(shield);
                     COUNTER++;
             }
 
-            enemypositionY = 50;
+
+
+
+            //bottom row
+            enemypositionX = 100;
             COUNTER = 0;
-            for (int i=0;i<6;i++)//bottom row
+            for (int i=0;i<6;i++)
             {
                 if(i==2)
                 {
-                    enemypositionY = 350;
+                    enemypositionX = 400;
                     COUNTER = 0;
                 }
                 if(i==4)
                 {
-                    enemypositionY = 650;
+                    enemypositionX = 700;
                     COUNTER = 0;
                 }
                 var shield = new ShieldViewModel(relativePathToAssets, 64, 64, 1, 1, true);
                 shield.Source.Opacity = 1;
-                shield.SetPosition(130 * COUNTER + enemypositionY, 430);
+                shield.SetPosition(130 * COUNTER + enemypositionX, 430);
                 Actors.Add(shield);
                 _Shileds2.Add(shield);
                 COUNTER++;
@@ -238,10 +253,10 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
 
 
-        private void SpawnRedSpaceShip()
+        private void SpawnRedSpaceShip()//SpawnRedSpaceShip 
         {
             Random _random= new Random();
-            int randDir = _random.Next(0,1);
+            int randDir = _random.Next(0,2);
             randDir = direction[randDir];
             string relativePathToAssets = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersRedSpaceShipT.png";
             redSpaceShip = new RedSpaceShipViewModel(relativePathToAssets, 64, 64, randDir, 1,true);
@@ -257,7 +272,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
             Actors.Add(redSpaceShip);   
         }
 
-        private void DeSpawnRedSpaceShip()
+        private void DeSpawnRedSpaceShip()//DeSpawnRedSpaceShip
         {
             if(redSpaceShip == null) return;
             else if(redSpaceShip.LocationX>GameBoardWidth - redSpaceShip.Width)
@@ -274,7 +289,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
 
 
-        private void SpawnBullet()
+        private void SpawnBullet()//SpawnBullet
         {
             if (player == null || bullet != null) return;
 
@@ -288,7 +303,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
 
 
-        private void DeSpawnBullet()
+        private void DeSpawnBullet()//DeSpawnBullet
         {
             if (bullet!=null && bullet.LocationY < 0)
             {
@@ -298,18 +313,30 @@ namespace AvaloniaSpaceInvaders.ViewModels
                 
         }
 
-        private void SpawnEnemyBullet()
+        private void SpawnEnemyBullet()//SpawnEnemyBullet
         {
-            if (_enemiesList.All(row => row.Count == 0)) return;
+            if (_enemiesList[0].Count==0) 
+                return;
+
+            Random random =new Random();
+
+            int rand = random.Next(0, _enemiesList[0].Count-1);
+
+            while (_enemiesList[0][rand].IsAlive == true)
+            {
+                rand = random.Next(0, _enemiesList[0].Count - 1);
+            }
 
             string relativePathToAssets = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersBullet.ico";
-            var enemyBullet = new EnemyBulletViewModel(relativePathToAssets, 32, 32, 1, 1, true);
-            enemyBullet.SetPosition(500, 0); // Randomize the position
+            var enemyBullet = new EnemyBulletViewModel(relativePathToAssets, 32, 32, 1, 1, false, _enemiesList[0][rand].Id);
+            enemyBullet.SetPosition(_enemiesList[0][rand].LocationX, _enemiesList[0][rand].LocationY);
+            _enemiesList[0][rand].IsAlive= true;
             _enemyBullets.Add(enemyBullet);
             _actors.Add(enemyBullet);
 
         }
-        private void DeSpawnEnemyBullet()
+
+        private void DeSpawnEnemyBullet()//DeSpawnEnemyBullet
         {
             foreach (var enemyBullet in _enemyBullets)
             {
@@ -317,14 +344,20 @@ namespace AvaloniaSpaceInvaders.ViewModels
                 {
                     _enemyBullets.Remove(enemyBullet);
                     _actors.Remove(enemyBullet);
-
+                    for(int i = 0; i < _enemiesList[0].Count-1;i++)
+                    {
+                        if (_enemiesList[0][i].Id==enemyBullet.Id)
+                        {
+                            _enemiesList[0][i].IsAlive= false;
+                        }
+                    }
+                    
                     return;
                 }
             }
         }
-        private void GameWonFunc()
+        private void GameWonFunc()//GameWonFunc - clears actors, and spawns everything again
         {
-            GameWon = false;
             Lives = 3;
             levelSpeed += 1;
             _actors.Clear();
@@ -334,35 +367,30 @@ namespace AvaloniaSpaceInvaders.ViewModels
             SpawnRedSpaceShip();
         }
 
-        private void GameOverFunc()
+        private void GameOverFunc()//clears the screen and saves the current score if its new high score
         {
             if (Score >= HighScore)
             {
                 HighScore = Score;
                 SaveHighScore();
             }
-            //UserControlChange();
+            _actors.Clear();
+            
         }
 
 
-        //public void UserControlChange(object sender, RoutedEventArgs args)
-        //{
-        //    MainWindow window = this.;
-        //    window.CurrentView.Content = new MainView();
-        //}
-
-        private void LoadHighScore()
+        private void LoadHighScore()//loads high score from file 
         {
             try
             {
                 if (File.Exists(HighScoreFilePath))
                 {
-                    var highScoreJson = File.ReadAllText(HighScoreFilePath);
-                    var highScoreData = JsonSerializer.Deserialize<HighScoreModel>(highScoreJson);
-                    HighScore = highScoreData?.HighScore ?? 0;
+                    var highScoreJson = File.ReadAllText(HighScoreFilePath);//gets file data
+                    var highScoreData = JsonSerializer.Deserialize<HighScoreModel>(highScoreJson);//Deserialize the data from file
+                    HighScore = highScoreData?.HighScore ?? 0;//if (highscore data from file == null) sets to 0
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex)//if there was a problem sets (high score = 0)
             {
                 // Handle exceptions, e.g., logging
                 HighScore = 0;
@@ -373,9 +401,10 @@ namespace AvaloniaSpaceInvaders.ViewModels
         {
             try
             {
-                var highScoreData = new HighScoreModel { HighScore = HighScore };
-                var highScoreJson = JsonSerializer.Serialize(highScoreData);
-                File.WriteAllText(HighScoreFilePath, highScoreJson);
+                var highScoreData = new HighScoreModel { HighScore = HighScore };//sets the current highscore to
+                                                                                 //highscore viewmodel data
+                var highScoreJson = JsonSerializer.Serialize(highScoreData);//Serialize the current viewmodel highscore
+                File.WriteAllText(HighScoreFilePath, highScoreJson);//writes the highscore in the file
             }
             catch (Exception ex)
             {
@@ -385,435 +414,230 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
 
 
-        private void GameLoop(object sender, EventArgs e)
+        private void GameLoop(object sender, EventArgs e)//happends every 16.6 sec
         {
-
-            // moving all the actor with their own implementation
+            // Move all actors
             foreach (var actor in Actors)
             {
-                actor.Move();
-
+                actor.Move();//call all actors move functions 
             }
 
-            
+            // Collision: player with borders(value,min,max)
+            player.LocationX = Math.Clamp(player.LocationX, 0, GameBoardWidth - player.Width);
 
+            // Despawn bullets and other objects
+            if (bullet != null) DeSpawnBullet();
+            if (_enemyBullets.Count > 0) DeSpawnEnemyBullet();
+            if (redSpaceShip != null) DeSpawnRedSpaceShip();
 
-            //collision player with boarders----
-            if(player.LocationX + player.Width>=GameBoardWidth)
+            // Check for player bullet collision
+            if (player != null)
             {
-                player.LocationX = GameBoardWidth - player.Width;
-            }
-            if(player.LocationX<=0)
-            {
-                player.LocationX = 0;   
-            }
-            //-----------------------------------
-
-
-            // despawning  bullets functinality
-            if (bullet!=null)
-            {
-                DeSpawnBullet();
-            }
-            if(_enemyBullets.Count>0)
-            {
-                DeSpawnEnemyBullet();
+                doesIntersect(_enemiesList, _Shileds, _Shileds2);
             }
 
-            if(redSpaceShip!=null)
-            {
-                DeSpawnRedSpaceShip();
-            }
-            
-            EnemyViewModel farestEnemy = null;
-            EnemyViewModel closestEnemy = null;
-
-            
-
-
-
-
-            // checking for player bullet collision 
-            if (player!=null&& bullet != null)
-            {
-                doesIntersect(_enemiesList, _Shileds,_Shileds2);
-            }
-
-
-
-            //checking for enemy bullet collision
-            if(_Shileds.Count>0 && _enemiesList[0].Count != 0 && _enemiesList[1].Count != 0 && _enemiesList[2].Count != 0 && _enemiesList[3].Count != 0 && _enemiesList[4].Count != 0)
+            // Check for enemy bullet collision
+            if (_Shileds.Count > 0 && _enemiesList.All(row => row.Count > 0))
             {
                 doesEnemyBulletIntersect(_enemyBullets, _Shileds, _Shileds2);
             }
 
-
-
-
-            if (_enemiesList[0].Count != 0 && _enemiesList[1].Count != 0 && _enemiesList[2].Count != 0 && _enemiesList[3].Count != 0 && _enemiesList[4].Count != 0)
+            // Determine closest and farthest enemies
+            if (_enemiesList.All(row => row.Count > 0))
             {
-                closestEnemy = getClosestEnemy();
-                farestEnemy = getFarestEnemy();
-            }
+                var closestEnemy = getClosestEnemy();
+                var farestEnemy = getFarestEnemy();
 
-            //enemies movement functionality( if enemies hit the right wall)
-            if (farestEnemy != null)
-            {
-                if (farestEnemy.LocationX + farestEnemy.Width >= GameBoardWidth)//
+                // Handle enemies hitting the walls
+                if (farestEnemy?.LocationX + farestEnemy.Width >= GameBoardWidth)
                 {
-
-                    foreach (EnemyViewModel enemy in _enemiesList[0])
-                    {
-                        enemy.LocationY += 2;
-                        enemy.Direction = -1;
-                    }
-                    foreach (EnemyViewModel enemy in _enemiesList[1])
-                    {
-                        enemy.LocationY += 2;
-                        enemy.Direction = -1;
-                    }
-                    foreach (EnemyViewModel enemy in _enemiesList[2])
-                    {
-                        enemy.LocationY += 2;
-                        enemy.Direction = -1;
-                    }
-                    foreach (EnemyViewModel enemy in _enemiesList[3])
-                    {
-                        enemy.LocationY += 2;
-                        enemy.Direction = -1;
-                    }
-                    foreach (EnemyViewModel enemy in _enemiesList[4])
-                    {
-                        enemy.LocationY += 2;
-                        enemy.Direction = -1;
-                    }
+                    ChangeEnemiesDirection(-1);//x-=1
+                }
+                if (closestEnemy?.LocationX <= 0)
+                {
+                    ChangeEnemiesDirection(1);//X+=1
                 }
             }
 
-            //enemies movement functionality( if enemies hit the left wall)
-            if (closestEnemy != null)
+            // Check if the player has won the game
+            if (_enemiesList.All(row => row.Count == 0))
             {
-                if (closestEnemy.LocationX <=0)
-                {
-
-                    foreach (EnemyViewModel enemy in _enemiesList[0])
-                    {
-                        enemy.LocationY += 2;
-                        enemy.Direction = 1;
-                    }
-                    foreach (EnemyViewModel enemy in _enemiesList[1])
-                    {
-                        enemy.LocationY += 2;
-                        enemy.Direction = 1;
-                    }
-                    foreach (EnemyViewModel enemy in _enemiesList[2])
-                    {
-                        enemy.LocationY += 2;
-                        enemy.Direction = 1;
-                    }
-                    foreach (EnemyViewModel enemy in _enemiesList[3])
-                    {
-                        enemy.LocationY += 2;
-                        enemy.Direction = 1;
-                    }
-                    foreach (EnemyViewModel enemy in _enemiesList[4])
-                    {
-                        enemy.LocationY += 2;
-                        enemy.Direction = 1;
-                    }
-                }
-            }
-
-            //checking if player won the game 
-            if ((_enemiesList[0].Count == 0 && _enemiesList[1].Count == 0 && _enemiesList[2].Count == 0
-                && _enemiesList[3].Count == 0 && _enemiesList[4].Count == 0))
-            {
-                GameWon = true;
                 GameWonFunc();
             }
 
-            //game over checking 
+            // Game over check
             if (Lives <= 0)
             {
                 GameOverFunc();
-                //direct to main view screen
+                // Direct to main view screen
             }
+        }
 
-
+        //ENEMIES DIRECTION/ MOVEMENT HANDLE
+        private void ChangeEnemiesDirection(int direction)
+        {
+            foreach (var row in _enemiesList)
+            {
+                foreach (var enemy in row)
+                {
+                    enemy.LocationY += 2;
+                    enemy.Direction = direction;
+                }
+            }
         }
 
 
 
 
-        //function for reciving the closest enemy to right wall
+        // Function for receiving the farthest enemy to the right wall
         private EnemyViewModel getFarestEnemy()
         {
-            EnemyViewModel enemy1= _enemiesList[0][_enemiesList[0].Count-1];
-            EnemyViewModel enemy2= _enemiesList[1][_enemiesList[1].Count-1];
-            EnemyViewModel enemy3 = _enemiesList[2][_enemiesList[2].Count-1];
-            EnemyViewModel enemy4 = _enemiesList[3][_enemiesList[3].Count - 1];
-            EnemyViewModel enemy5 = _enemiesList[4][_enemiesList[4].Count - 1];
+            EnemyViewModel farestEnemy = _enemiesList[0][_enemiesList[0].Count - 1];
 
-            EnemyViewModel farestEnemy = enemy1;
-            
-            
-            if(enemy2.LocationX> farestEnemy.LocationX)
-                farestEnemy=enemy2;
-            if(enemy3.LocationX > farestEnemy.LocationX)
-                farestEnemy = enemy3;
-            if(enemy4.LocationX > farestEnemy.LocationX)
-                farestEnemy = enemy4;
-            if(enemy5.LocationX > farestEnemy.LocationX)
-                farestEnemy = enemy5;
+            foreach (var row in _enemiesList)
+            {
+                var lastEnemyInRow = row[row.Count - 1];
+                if (lastEnemyInRow.LocationX > farestEnemy.LocationX)
+                {
+                    farestEnemy = lastEnemyInRow;
+                }
+            }
+
             return farestEnemy;
-
-
         }
 
-        //function for reciving the closest enemy to right wall
+        // Function for receiving the closest enemy to the left wall
         private EnemyViewModel getClosestEnemy()
         {
-            EnemyViewModel enemy1 = _enemiesList[0][0];
-            EnemyViewModel enemy2 = _enemiesList[1][0];
-            EnemyViewModel enemy3 = _enemiesList[2][0];
-            EnemyViewModel enemy4 = _enemiesList[3][0];
-            EnemyViewModel enemy5 = _enemiesList[4][0];
+            EnemyViewModel closestEnemy = _enemiesList[0][0];
 
-            EnemyViewModel closestEnemy = enemy1;
+            foreach (var row in _enemiesList)
+            {
+                var firstEnemyInRow = row[0];
+                if (firstEnemyInRow.LocationX < closestEnemy.LocationX)
+                {
+                    closestEnemy = firstEnemyInRow;
+                }
+            }
 
-            if (enemy2.LocationX <= closestEnemy.LocationX)
-                closestEnemy = enemy2;
-            if (enemy3.LocationX <= closestEnemy.LocationX)
-                closestEnemy = enemy3;
-            if (enemy4.LocationX <= closestEnemy.LocationX)
-                closestEnemy = enemy4;
-            if (enemy5.LocationX <= closestEnemy.LocationX)
-                closestEnemy = enemy5;
             return closestEnemy;
         }
 
 
 
 
+        
+
+        private void doesIntersect(List<List<EnemyViewModel>> enemiesList, List<ShieldViewModel> shields, List<ShieldViewModel> shields2)
+        {
+            if(bullet != null)
+            {
+                CheckBulletEnemyCollision(enemiesList);
+                CheckBulletShieldCollision(shields, shields2);
+                CheckBulletRedSpaceShipCollision();
+            }
+            
+            CheckEnemyPlayerCollision(enemiesList);
+        }
+
 
         private Random _random = new Random();
-
-        private void doesIntersect(List <List<EnemyViewModel>> _enemiesList, List<ShieldViewModel> _shields, List<ShieldViewModel> _shields2)//check if player bullet Intersect with anything
+        private void CheckBulletEnemyCollision(List<List<EnemyViewModel>> enemiesList)
         {
-            if (bullet!=null && _enemiesList[0].Count>0
-                && bullet.LocationY>= _enemiesList[0][0].LocationY && bullet.LocationY <= _enemiesList[0][0].LocationY + _enemiesList[0][0].Height)
-            {
-                foreach (EnemyViewModel enemy in _enemiesList[0])
-                {
-                    if(bullet.Intersects(enemy))
-                    {
-                        enemy.IsAlive = false;
-                        _actors.Remove(enemy);
-                        _enemiesList[0].Remove(enemy);
-                        _actors.Remove(bullet);
-                        bullet = null;
-                        Score += _random.Next(40,101);
-                        return;
-                    }
-                }
-            }
+            if (bullet == null) return;
 
-            if (bullet != null && _enemiesList[1].Count>0  && 
-                bullet.LocationY >= _enemiesList[1][0].LocationY && bullet.LocationY <= _enemiesList[1][0].LocationY + _enemiesList[1][0].Height)
+            foreach (var enemyRow in enemiesList)
             {
-                foreach (var enemy in _enemiesList[1])
+                if (enemyRow.Count == 0 || bullet.LocationY < enemyRow[0].LocationY || bullet.LocationY > enemyRow[0].LocationY + enemyRow[0].Height)
+                    continue;
+
+                foreach (var enemy in enemyRow.ToList())
                 {
                     if (bullet.Intersects(enemy))
                     {
                         enemy.IsAlive = false;
                         _actors.Remove(enemy);
-                        _enemiesList[1].Remove(enemy);
-                        _actors.Remove(bullet);
-                        bullet = null;
+                        enemyRow.Remove(enemy);
+                        RemoveBullet();
                         Score += _random.Next(40, 101);
                         return;
                     }
                 }
             }
+        }
 
-            if (bullet != null && _enemiesList[2].Count > 0 
-                && bullet.LocationY >= _enemiesList[2][0].LocationY && bullet.LocationY <= _enemiesList[2][0].LocationY + _enemiesList[2][0].Height)
+        private void CheckBulletShieldCollision(List<ShieldViewModel> shields, List<ShieldViewModel> shields2)
+        {
+            if (bullet == null) return;
+
+            CheckShieldCollision(shields);
+            CheckShieldCollision(shields2);
+        }
+
+        private void CheckShieldCollision(List<ShieldViewModel> shields)
+        {
+            if (shields.Count == 0 || bullet==null||bullet.LocationY != shields[0].LocationY) return;
+
+            foreach (var shield in shields.ToList())
             {
-                foreach (var enemy in _enemiesList[2])
+                if (bullet.Intersects(shield))
                 {
-                    if (bullet.Intersects(enemy))
+                    shield.Source.Opacity += 100;
+                    if (shield.Source.Opacity > 1000)
                     {
-                        enemy.IsAlive = false;
-                        _actors.Remove(enemy);
-                        _enemiesList[2].Remove(enemy);
-                        _actors.Remove(bullet);
-                        bullet = null;
-                        Score += _random.Next(40, 101);
-                        return;
-
+                        _actors.Remove(shield);
+                        shields.Remove(shield);
                     }
+                    RemoveBullet();
+                    return;
                 }
             }
+        }
 
-            if (bullet != null && _enemiesList[3].Count > 0 &&
-                bullet.LocationY >= _enemiesList[3][0].LocationY && bullet.LocationY <= _enemiesList[3][0].LocationY + _enemiesList[3][0].Height)
+        private void CheckBulletRedSpaceShipCollision()
+        {
+            if (bullet == null || redSpaceShip == null || bullet.LocationY != redSpaceShip.LocationY) return;
+
+            if (bullet.Intersects(redSpaceShip))
             {
-                foreach (var enemy in _enemiesList[3])
-                {
-                    if (bullet.Intersects(enemy))
-                    {
-                        enemy.IsAlive = false;
-                        _actors.Remove(enemy);
-                        _enemiesList[3].Remove(enemy);
-                        _actors.Remove(bullet);
-                        bullet = null;
-                        Score += _random.Next(40, 101);
-                        return;
-
-                    }
-                }
+                _actors.Remove(redSpaceShip);
+                redSpaceShip = null;
+                Score += _random.Next(40, 101);
+                RemoveBullet();
             }
+        }
 
-            if (bullet != null && _enemiesList[4].Count > 0 
-                && bullet.LocationY >= _enemiesList[4][0].LocationY && bullet.LocationY <= _enemiesList[4][0].LocationY + _enemiesList[4][0].Height)
+        private void CheckEnemyPlayerCollision(List<List<EnemyViewModel>> enemiesList)
+        {
+            if (player == null) return;
+
+            foreach (var enemyRow in enemiesList)
             {
-                foreach (var enemy in _enemiesList[4])
-                {
-                    if (bullet.Intersects(enemy))
-                    {
-                        enemy.IsAlive = false;
-                        _actors.Remove(enemy);
-                        _enemiesList[4].Remove(enemy);
-                        _actors.Remove(bullet);
-                        bullet = null;
-                        Score += _random.Next(40, 101);
-                        return;
+                if (enemyRow.Count == 0 || player.LocationY != enemyRow.Last().LocationY) continue;
 
-                    }
-                }
-            }
-            if(_shields.Count>0&& bullet.LocationY == _shields[0].LocationY)
-            {
-                foreach (var shiled in _shields)
-                {
-                     if (bullet.Intersects(shiled))
-                     {
-
-                        shiled.Source.Opacity += 100;
-                        if(shiled.Source.Opacity>1000)
-                        {
-                            _actors.Remove(shiled);
-                            _shields.Remove(shiled);
-                        }
-                        _actors.Remove(bullet);
-                        bullet = null;
-                        return;
-                     }
-                }
-            }
-
-            if (_shields2.Count > 0 && bullet.LocationY == _shields2[0].LocationY)
-            {
-                foreach (var shiled in _shields2)
-                {
-                    if (bullet.Intersects(shiled))
-                    {
-                        shiled.Source.Opacity += 100;
-                        if (shiled.Source.Opacity > 1000)
-                        {
-                            _actors.Remove(shiled);
-                            _shields2.Remove(shiled);
-                        }
-                        _actors.Remove(bullet);
-                        bullet = null;
-                        return;
-                    }
-                }
-
-            }
-
-
-            //red space ship collision functionality
-            if(redSpaceShip!=null && bullet.LocationY == redSpaceShip.LocationY)
-            {
-                if(bullet.Intersects(redSpaceShip))
-                {
-                    _actors.Remove(redSpaceShip);
-                    redSpaceShip = null;
-                    Score += _random.Next(40, 101);//change the score to be random 
-                }
-            }
-
-
-
-            // Check collision between player and enemies
-            if (player != null && _enemiesList[0].Count>0 && player.LocationY == _enemiesList[0][_enemiesList[0].Count-1].LocationY)
-            {
-                foreach(var enemy in _enemiesList[0])
+                foreach (var enemy in enemyRow)
                 {
                     if (enemy.Intersects(player))
                     {
-                        Lives = 0;
-                        GameOverFunc();
-                    }
-                }         
-            }
-
-
-            if (player != null && _enemiesList[1].Count > 0 && player.LocationY == _enemiesList[1][_enemiesList[1].Count - 1].LocationY)
-            {
-                foreach (var enemy in _enemiesList[1])
-                {
-                    if (enemy.Intersects(player))
-                    {
-                        Lives = 0;
-                        GameOverFunc();
+                    Lives = 0;
+                    GameOverFunc();
+                    return;
                     }
                 }
             }
+        }
 
-            if (player != null && _enemiesList[2].Count > 0 && player.LocationY == _enemiesList[2][_enemiesList[2].Count - 1].LocationY)
-            {
-                foreach (var enemy in _enemiesList[2])
-                {
-                    if (enemy.Intersects(player))
-                    {
-                        Lives = 0;
-                        GameOverFunc();
-                    }
-                }
-            }
-
-            if (player != null && _enemiesList[3].Count > 0 && player.LocationY == _enemiesList[3][_enemiesList[3].Count - 1].LocationY)
-            {
-                foreach (var enemy in _enemiesList[3])
-                {
-                    if (enemy.Intersects(player))
-                    {
-                        Lives = 0;
-                        GameOverFunc();
-                    }
-                }
-            }
-
-            if (player != null && _enemiesList[4].Count > 0 && player.LocationY == _enemiesList[4][_enemiesList[4].Count - 1].LocationY)
-            {
-                foreach (var enemy in _enemiesList[4])
-                {
-                    if (enemy.Intersects(player))
-                    {
-                        Lives = 0;
-                        GameOverFunc();
-                    }
-                }
-            }
+        private void RemoveBullet()
+        {
+            _actors.Remove(bullet);
+            bullet = null;
         }
 
         private void doesEnemyBulletIntersect(List<EnemyBulletViewModel> _enemyBullets,List<ShieldViewModel>_shields, List<ShieldViewModel> _shields2)//check if enemy bullet intersects with anything
         {
             foreach(var enemyBullet in _enemyBullets)//enemy bullet intersects with a shiled 
             {
-                if(enemyBullet.LocationY == _shields[0].LocationY)
+                if(enemyBullet.LocationY >= _shields[0].LocationY)
                 {
                     foreach(var shiled in _shields)
                     {
@@ -827,6 +651,16 @@ namespace AvaloniaSpaceInvaders.ViewModels
                                 _actors.Remove(shiled);
                                 _shields.Remove(shiled);
                             }
+                            //set bullet alive = false , can now spawn bullets 
+                            //_enemiesList[0][enemyBullet.Id].IsAlive = false;
+                            for(int i = 0; i < _enemiesList[0].Count - 1; i++)
+                            {
+                                if (_enemiesList[0][i].Id== enemyBullet.Id)
+                                {
+                                    _enemiesList[0][i].IsAlive = false;
+                                    
+                                }
+                            }
                             _enemyBullets.Remove(enemyBullet);
                             _actors.Remove(enemyBullet);
                             return;
@@ -834,7 +668,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
                     }
                 }
 
-                if (enemyBullet.LocationY == _shields2[0].LocationY)
+                if (enemyBullet.LocationY >= _shields2[0].LocationY)
                 {
                     foreach (var shiled in _shields2)
                     {
@@ -848,6 +682,16 @@ namespace AvaloniaSpaceInvaders.ViewModels
                                 _actors.Remove(shiled);
                                 _shields2.Remove(shiled);
                             }
+                            //set bullet alive = false , can now spawn bullets 
+                            //_enemiesList[0][enemyBullet.Id].IsAlive = false;
+                            for (int i = 0; i < _enemiesList[0].Count - 1; i++)
+                            {
+                                if (_enemiesList[0][i].Id == enemyBullet.Id)
+                                {
+                                    _enemiesList[0][i].IsAlive = false;
+                                    
+                                }
+                            }
                             _enemyBullets.Remove(enemyBullet);
                             _actors.Remove(enemyBullet);
                             return;
@@ -858,11 +702,21 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
             foreach (var enemyBullet in _enemyBullets)//enemy bullet intersects with a player 
             {
-                if (enemyBullet.LocationY == player.LocationY)
+                if (enemyBullet.LocationY >= player.LocationY)
                 {
                     
                     if (enemyBullet.Intersects(player))
                     {
+                        //set bullet alive = false , can now spawn bullets 
+                        //_enemiesList[0][enemyBullet.Id].IsAlive = false;
+                        for (int i = 0; i < _enemiesList[0].Count - 1; i++)
+                        {
+                            if (_enemiesList[0][i].Id == enemyBullet.Id)
+                            {
+                                _enemiesList[0][i].IsAlive = false;
+
+                            }
+                        }
                         Lives--;
                         _enemyBullets.Remove(enemyBullet);
                         _actors.Remove(enemyBullet);

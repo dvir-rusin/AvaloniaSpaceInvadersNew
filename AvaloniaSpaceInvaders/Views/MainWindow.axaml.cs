@@ -16,4 +16,11 @@ public partial class MainWindow : Window
         CurrentView.Content = new GameScreen();
 
     }
+
+    public void ClickHandler2(object sender, RoutedEventArgs args)
+    {
+        CurrentView.Content = new MainView();
+
+    }
+
 }
