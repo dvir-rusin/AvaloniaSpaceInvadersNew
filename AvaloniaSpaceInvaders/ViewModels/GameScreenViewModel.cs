@@ -634,12 +634,16 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
 
 
-        
 
+
+        /// <summary>
+        /// Handles interactions between bullets, enemies, shields, and the player.
+        /// </summary>
         private void doesIntersect(List<List<EnemyViewModel>> enemiesList, List<ShieldViewModel> shields, List<ShieldViewModel> shields2)
         {
-            if(bullet != null)
+            if (bullet != null)
             {
+                // Check for bullet collisions with enemies, shields, and red spaceship
                 CheckBulletEnemyCollision(enemiesList);
                 CheckBulletShieldCollision(shields, shields2);
                 CheckBulletRedSpaceShipCollision();
@@ -647,18 +651,25 @@ namespace AvaloniaSpaceInvaders.ViewModels
             if (_enemiesList.All(row => row.Count != 0))
             {
                 CheckEnemyPlayerCollision(enemiesList);
-
             }
         }
 
 
+
+
         private Random _random = new Random();
+
+        /// <summary>
+        /// Checks if the bullet collides with any enemy and handles the collision.
+        /// </summary>
+        /// <param name="enemiesList">List of enemy rows in the game.</param>
         private void CheckBulletEnemyCollision(List<List<EnemyViewModel>> enemiesList)
         {
             if (bullet == null) return;
 
             foreach (var enemyRow in enemiesList)
             {
+                // Skip empty rows or rows where the bullet is not aligned with any enemy
                 if (enemyRow.Count == 0 || bullet.LocationY < enemyRow[0].LocationY || bullet.LocationY > enemyRow[0].LocationY + enemyRow[0].Height)
                     continue;
 
@@ -666,6 +677,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
                 {
                     if (bullet.Intersects(enemy))
                     {
+                        // Mark the enemy as dead, remove it from the actors and row lists, and remove the bullet
                         enemy.IsAlive = false;
                         _actors.Remove(enemy);
                         enemyRow.Remove(enemy);
@@ -677,30 +689,46 @@ namespace AvaloniaSpaceInvaders.ViewModels
             }
         }
 
+
+
+
+        /// <summary>
+        /// Checks if the bullet collides with any shield and handles the collision.
+        /// </summary>
+        /// <param name="shields">The first list of shields.</param>
+        /// <param name="shields2">The second list of shields.</param>
         private void CheckBulletShieldCollision(List<ShieldViewModel> shields, List<ShieldViewModel> shields2)
         {
             if (bullet == null) return;
 
+            // Check collisions for both sets of shields
             CheckShieldCollision(shields);
             CheckShieldCollision(shields2);
         }
 
+
+
+
+        /// <summary>
+        /// Checks if the bullet collides with a shield and handles the collision.
+        /// </summary>
+        /// <param name="shields">List of shields to check against.</param>
         private void CheckShieldCollision(List<ShieldViewModel> shields)
         {
-            
-            if (shields.Count == 0 || bullet==null||
+            if (shields.Count == 0 || bullet == null ||
                 (bullet.LocationY < shields[0].LocationY || bullet.LocationY > shields[0].LocationY + shields[0].Height)) return;
 
             foreach (var shield in shields.ToList())
             {
                 if (bullet.Intersects(shield))
                 {
+                    // Handle the shield being hit, updating its state, and potentially removing it
                     shield.HitCount++;
-                    if(shield.HitCount * 100%3==0)
+                    if (shield.HitCount * 100 % 3 == 0)
                     {
                         shield.Source.Opacity = shield.HitCount * 100;
                     }
-                    
+
                     if (shield.Source.Opacity > 700)
                     {
                         _actors.Remove(shield);
@@ -712,12 +740,18 @@ namespace AvaloniaSpaceInvaders.ViewModels
             }
         }
 
+
+
+        /// <summary>
+        /// Checks if the bullet collides with the red spaceship and handles the collision.
+        /// </summary>
         private void CheckBulletRedSpaceShipCollision()
         {
             if (bullet == null || redSpaceShip == null || bullet.LocationY != redSpaceShip.LocationY) return;
 
             if (bullet.Intersects(redSpaceShip))
             {
+                // Remove the red spaceship and the bullet, update the score
                 _actors.Remove(redSpaceShip);
                 redSpaceShip = null;
                 Score += _random.Next(40, 101);
@@ -725,6 +759,12 @@ namespace AvaloniaSpaceInvaders.ViewModels
             }
         }
 
+
+
+        /// <summary>
+        /// Checks if any enemies collide with the player and handles the collision.
+        /// </summary>
+        /// <param name="enemiesList">List of enemy rows in the game.</param>
         private void CheckEnemyPlayerCollision(List<List<EnemyViewModel>> enemiesList)
         {
             if (player == null) return;
@@ -737,139 +777,157 @@ namespace AvaloniaSpaceInvaders.ViewModels
                 {
                     if (enemy.Intersects(player))
                     {
-                    Lives = 0;
-                    GameOverFunc();
-                    return;
+                        // Set lives to zero and trigger game over
+                        Lives = 0;
+                        GameOverFunc();
+                        return;
                     }
                 }
             }
         }
 
+
+
+        /// <summary>
+        /// Removes the player bullet from the game actors and sets it to null.
+        /// </summary>
         private void RemoveBullet()
         {
             _actors.Remove(bullet);
             bullet = null;
         }
 
-        private void doesEnemyBulletIntersect(List<EnemyBulletViewModel> _enemyBullets,List<ShieldViewModel>_shields, List<ShieldViewModel> _shields2)//check if enemy bullet intersects with anything
-        {
-            foreach(var enemyBullet in _enemyBullets)//enemy bullet intersects with a shiled 
-            {
-                if(enemyBullet.LocationY >= _shields[0].LocationY)
-                {
-                    foreach(var shiled in _shields)
-                    {
-                        if (enemyBullet.Intersects(shiled))
-                        {
-                            for (int i = 0; i < _enemiesList[0].Count - 1; i++)
-                            {
-                                if (_enemiesList[0][i].Id == enemyBullet.Id)
-                                {
-                                    _enemiesList[0][i].IsAlive = false;
-                                }
-                            }
-                            //neede to add opacity shiled changes 
-                            //shiled.Source.Transitions.Clear();
-                            shiled.HitCount++;
-                            if (shiled.HitCount * 100 % 3 == 0)
-                            {
-                                shiled.Source.Opacity = shiled.HitCount * 100;
-                            }
-                            if (shiled.Source.Opacity > 700)
-                            {
-                                _actors.Remove(shiled);
-                                _shields.Remove(shiled);
-                            }
-                            //set bullet alive = false , can now spawn bullets 
-                            //_enemiesList[0][enemyBullet.Id].IsAlive = false;
-                            setIsAlive(_enemyBullets, enemyBullet.Id);
 
-                            //remove the bullet from actors and enemybullets list 
-                            _enemyBullets.Remove(enemyBullet);
-                            _actors.Remove(enemyBullet);
-                            return;
-                        }
-                    }
+
+
+        /// <summary>
+        /// Checks if any enemy bullets intersect with shields or the player and handles the results.
+        /// </summary>
+        /// <param name="enemyBullets">List of enemy bullets in the game.</param>
+        /// <param name="shields">List of the first set of shields in the game.</param>
+        /// <param name="shields2">List of the second set of shields in the game.</param>
+        private void doesEnemyBulletIntersect(List<EnemyBulletViewModel> enemyBullets, List<ShieldViewModel> shields, List<ShieldViewModel> shields2)
+        {
+            var bulletsToRemove = new List<EnemyBulletViewModel>();
+
+            // Iterate over each enemy bullet to check for intersections
+            foreach (var enemyBullet in enemyBullets)
+            {
+                // Check for intersections with the shields
+                if (CheckAndHandleShieldIntersection(enemyBullet, shields) || CheckAndHandleShieldIntersection(enemyBullet, shields2))
+                {
+                    bulletsToRemove.Add(enemyBullet);
+                    continue;
                 }
 
-                if (_shields2.Count>0&&enemyBullet.LocationY >= _shields2[0].LocationY 
-                    && enemyBullet.LocationY <= _shields2[0].LocationY + _shields2[0].Height)
+                // Check for intersections with the player
+                if (CheckAndHandlePlayerIntersection(enemyBullet))
                 {
-                    foreach (var shiled in _shields2)
-                    {
-                        if (enemyBullet.Intersects(shiled))
-                        {
-
-                            for (int i = 0; i < _enemiesList[0].Count - 1; i++)
-                            {
-                                if (_enemiesList[0][i].Id == enemyBullet.Id)
-                                {
-                                    _enemiesList[0][i].IsAlive = false;
-                                }
-                            }
-                            //neede to add opacity shiled changes 
-                            //shiled.Source.Transitions.Clear();
-                            shiled.HitCount++;
-                            if (shiled.HitCount * 100 % 3 == 0)
-                            {
-                                shiled.Source.Opacity = shiled.HitCount * 100;
-                            }
-                            if (shiled.Source.Opacity > 700)
-                            {
-                                _actors.Remove(shiled);
-                                _shields.Remove(shiled);
-                            }
-                            //set bullet alive = false , can now spawn bullets 
-                            //_enemiesList[0][enemyBullet.Id].IsAlive = false;
-                            setIsAlive(_enemyBullets, enemyBullet.Id);
-
-                            _enemyBullets.Remove(enemyBullet);
-                            _actors.Remove(enemyBullet);
-                            return;
-                        }
-                    }
+                    bulletsToRemove.Add(enemyBullet);
+                    break; // Stop further processing if a bullet hits the player
                 }
             }
 
-            foreach (var enemyBullet in _enemyBullets)//enemy bullet intersects with a player 
+            // Remove bullets that have been processed
+            foreach (var bullet in bulletsToRemove)
             {
-                if (enemyBullet.LocationY >= player.LocationY)
-                {
-                    
-                    if (enemyBullet.Intersects(player))
-                    {
-
-                        for (int i = 0; i < _enemiesList[0].Count - 1; i++)
-                        {
-                            if (_enemiesList[0][i].Id == enemyBullet.Id)
-                            {
-                                _enemiesList[0][i].IsAlive = false;
-                            }
-                        }
-
-                        //set bullet alive = false , can now spawn bullets 
-                        //_enemiesList[0][enemyBullet.Id].IsAlive = false;
-                        setIsAlive(_enemyBullets, enemyBullet.Id);
-                        Lives--;
-                        _enemyBullets.Remove(enemyBullet);
-                        _actors.Remove(enemyBullet);
-                        return;
-                    }
-                    
-                }
+                RemoveBullet(bullet);
             }
         }
 
-        private void setIsAlive(List<EnemyBulletViewModel> _enemyBullets,int enemyId)
+
+
+        /// <summary>
+        /// Checks if an enemy bullet intersects with any shield in the provided list and handles the intersection.
+        /// </summary>
+        /// <param name="enemyBullet">The enemy bullet to check.</param>
+        /// <param name="shields">The list of shields to check against.</param>
+        /// <returns>True if an intersection occurs, otherwise false.</returns>
+        private bool CheckAndHandleShieldIntersection(EnemyBulletViewModel enemyBullet, List<ShieldViewModel> shields)
+        {
+            if (shields.Count > 0 && enemyBullet.LocationY >= shields[0].LocationY)
+            {
+                foreach (var shield in shields)
+                {
+                    if (enemyBullet.Intersects(shield))
+                    {
+                        HandleShieldHit(shield);
+                        setIsAlive(enemyBullet.Id);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+
+
+        /// <summary>
+        /// Checks if an enemy bullet intersects with the player and handles the intersection.
+        /// </summary>
+        /// <param name="enemyBullet">The enemy bullet to check.</param>
+        /// <returns>True if an intersection occurs, otherwise false.</returns>
+        private bool CheckAndHandlePlayerIntersection(EnemyBulletViewModel enemyBullet)
+        {
+            if (enemyBullet.LocationY >= player.LocationY && enemyBullet.Intersects(player))
+            {
+                Lives--;
+                setIsAlive(enemyBullet.Id);
+                return true;
+            }
+            return false;
+        }
+
+
+
+
+        /// <summary>
+        /// Handles the event when a shield is hit by an enemy bullet.
+        /// </summary>
+        /// <param name="shield">The shield that was hit.</param>
+        private void HandleShieldHit(ShieldViewModel shield)
+        {
+            shield.HitCount++;
+            if (shield.HitCount * 100 % 3 == 0)
+            {
+                shield.Source.Opacity = shield.HitCount * 100;
+            }
+            if (shield.Source.Opacity > 700)
+            {
+                _actors.Remove(shield);
+            }
+        }
+
+
+
+
+        /// <summary>
+        /// Removes the specified bullet from the lists of active bullets and game actors.
+        /// </summary>
+        /// <param name="enemyBullet">The bullet to remove.</param>
+        private void RemoveBullet(EnemyBulletViewModel enemyBullet)
+        {
+            _enemyBullets.Remove(enemyBullet);
+            _actors.Remove(enemyBullet);
+        }
+
+
+
+
+        /// <summary>
+        /// Sets the IsAlive status of an enemy associated with a bullet ID to false.
+        /// </summary>
+        /// <param name="enemyId">The ID of the enemy whose status is to be updated.</param>
+        private void setIsAlive(int enemyId)
         {
             for (int i = 0; i < _enemiesList[0].Count - 1; i++)
             {
                 if (_enemiesList[0][i].Id == enemyId)
                 {
                     _enemiesList[0][i].IsAlive = false;
-
                 }
             }
         }
+
     }
 }
