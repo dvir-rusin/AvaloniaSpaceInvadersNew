@@ -19,7 +19,15 @@
 				<TextBlock HorizontalAlignment="Center" Name="ScoreText" Margin="10" Foreground="LimeGreen" FontWeight="Bold" Text="{Binding Score, StringFormat='Score: {0}'}"/>
 				<TextBlock Name="LivesText" Margin="10" Foreground="LimeGreen" FontWeight="Bold" Text="{Binding Lives, StringFormat='Lives: {0}'}"/>
 				<TextBlock Name="HighScore" Margin="10" Foreground="LimeGreen" FontWeight="Bold" Text="{Binding HighScore, StringFormat='HighScore: {0}'}"/>
+				<TextBlock Name="Name" Margin="10" Foreground="LimeGreen" FontWeight="Bold" Text="{Binding CurrentName, StringFormat='current Name: {0}'}"/>
+				<TextBlock Name="HighScoreName" Margin="10" Foreground="LimeGreen" FontWeight="Bold" Text="{Binding HighScoreName, StringFormat='High Score Name: {0}'}"/>
+				<TextBlock Margin="10" Foreground="LimeGreen" FontWeight="Bold"  Text="Enter your name:"/>
+				<TextBox Text="{Binding PlayerNameInput}" Height="20" Width="50" Margin="0,0,0,10"/>
+				<Button Content="Submit" Command="{Binding SubmitNameCommand}" Background="LimeGreen" Margin="10" Foreground="black" FontWeight="Bold"  />
+			
 				</StackPanel>
+			<!-- High Score Input Section -->
+		
 		
 		<!-- Outer arcade machine border -->
 		<Border BorderBrush="LimeGreen" BorderThickness="10" CornerRadius="15">

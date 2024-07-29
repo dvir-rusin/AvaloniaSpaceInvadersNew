@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace AvaloniaSpaceInvaders.Models
 {
-    internal class HighScoreModel
+    public class HighScoreModel
     {
-        [JsonPropertyName("high_score")]
+        public List<HighScoreEntry> HighScores { get; set; } = new List<HighScoreEntry>();
+    }
+
+    public class HighScoreEntry
+    {
         public int HighScore { get; set; }
+        public string Name { get; set; }
     }
 }

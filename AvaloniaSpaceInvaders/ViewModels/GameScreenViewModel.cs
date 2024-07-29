@@ -22,11 +22,14 @@ using AvaloniaSpaceInvaders.Views;
 using AvaloniaSpaceInvaders.objects;
 using System.Text.Json;
 using System.IO;
+using Avalonia.Input.TextInput;
 
 namespace AvaloniaSpaceInvaders.ViewModels
 {
     public class GameScreenViewModel : ReactiveObject
     {
+        bool isHighScore = false;
+        bool gameOver = false;
         public int GameBoardWidth { get; set; } = 1000;
         public int GameBoardHeight { get; set; } = 900;
 
@@ -38,14 +41,9 @@ namespace AvaloniaSpaceInvaders.ViewModels
         }
 
         private List<List<EnemyViewModel>> _enemiesList= new List<List<EnemyViewModel>>();
-        private List<EnemyViewModel> _enemies1 = new List<EnemyViewModel>();
-        private List<EnemyViewModel> _enemies2 = new List<EnemyViewModel>();
-        private List<EnemyViewModel> _enemies3 = new List<EnemyViewModel>();
-        private List<EnemyViewModel> _enemies4 = new List<EnemyViewModel>();
-        private List<EnemyViewModel> _enemies5 = new List<EnemyViewModel>();
 
         private int levelSpeed = 1;
-        private int _lives = 3;
+        private int _lives = 3;//change
         public int Lives
         {
             get => _lives;
@@ -59,12 +57,40 @@ namespace AvaloniaSpaceInvaders.ViewModels
         }
 
         private int _HighScore = 0;
+        private string? _HighScoreName = null;
         public int HighScore
         {
             get => _HighScore;
             set => this.RaiseAndSetIfChanged(ref _HighScore, value);
         }
-        private const string HighScoreFilePath = "highscore.json";//FILE to save high score
+        public string HighScoreName
+        {
+            get => _HighScoreName;
+            set => this.RaiseAndSetIfChanged(ref _HighScoreName, value);
+        }
+
+        private bool _isNameInputVisible;
+        public bool IsNameInputVisible
+        {
+            get => _isNameInputVisible;
+            set => this.RaiseAndSetIfChanged(ref _isNameInputVisible, value);
+        }
+
+        private string _playerNameInput;
+        public string PlayerNameInput
+        {
+            get => _playerNameInput;
+            set => this.RaiseAndSetIfChanged(ref _playerNameInput, value);
+        }
+
+        private string _currentName;
+        public string CurrentName
+        {
+            get => _currentName;
+            set => this.RaiseAndSetIfChanged(ref _currentName, value);
+        }
+        private const string HighScoreFilePath = "highscore2.json";
+        private HighScoreModel _highScoreModel = new HighScoreModel();
 
         private BulletViewModel bullet = null;
         private PlayerViewModel player=null;
@@ -84,6 +110,8 @@ namespace AvaloniaSpaceInvaders.ViewModels
         public ICommand SpawnEnemyBulletCommand { get; }
         public ICommand MovePlayerLeftCommand { get; }
         public ICommand MovePlayerRightCommand { get; }
+        public ICommand SubmitNameCommand { get; }
+        public ICommand NavigateToGameResultScreenCommand { get; }
 
 
         private void InitializeEnemies()//InitializeEnemies
@@ -95,38 +123,52 @@ namespace AvaloniaSpaceInvaders.ViewModels
         }
         public GameScreenViewModel()
         {
-            SpawnPlayerCommand = ReactiveCommand.Create(SpawnPlayer);
-            SpawnEnemyCommand = ReactiveCommand.Create(SpawnEnemies);
-            SpawnShieldCommand = ReactiveCommand.Create(SpawnShield);
-            SpawnRedSpaceShipCommand = ReactiveCommand.Create(SpawnRedSpaceShip);
-            SpawnBulletCommand = ReactiveCommand.Create(SpawnBullet);
-            SpawnEnemyBulletCommand = ReactiveCommand.Create(SpawnEnemyBullet);
-            MovePlayerLeftCommand = ReactiveCommand.Create(MoveLeft);//player.MoveLeft
-            MovePlayerRightCommand = ReactiveCommand.Create(MoveRight);//player.MoveRight
+            if (gameOver != true)
+            {
+                SpawnPlayerCommand = ReactiveCommand.Create(SpawnPlayer);
+                SpawnEnemyCommand = ReactiveCommand.Create(SpawnEnemies);
+                SpawnShieldCommand = ReactiveCommand.Create(SpawnShield);
+                SpawnRedSpaceShipCommand = ReactiveCommand.Create(SpawnRedSpaceShip);
+                SpawnBulletCommand = ReactiveCommand.Create(SpawnBullet);
+                SpawnEnemyBulletCommand = ReactiveCommand.Create(SpawnEnemyBullet);
+                MovePlayerLeftCommand = ReactiveCommand.Create(MoveLeft);//player.MoveLeft
+                MovePlayerRightCommand = ReactiveCommand.Create(MoveRight);//player.MoveRight
+                SubmitNameCommand = ReactiveCommand.Create(SubmitName);
 
-            var gameLoopTimer = new DispatcherTimer();
-            gameLoopTimer.Interval = TimeSpan.FromMilliseconds(16.66);
-            gameLoopTimer.Tick += GameLoop;
-            gameLoopTimer.Start();
+                var gameLoopTimer = new DispatcherTimer();
+                gameLoopTimer.Interval = TimeSpan.FromMilliseconds(16.66);
+                gameLoopTimer.Tick += GameLoop;
+                gameLoopTimer.Start();
 
-            InitializeEnemies();//create 5 lists of enemies 
-            LoadHighScore();//LoadHighScore
-            SpawnPlayer();//SpawnPlayer
-            SpawnEnemies();//SpawnEnemies
-            SpawnShield();//SpawnShield
+                InitializeEnemies();//create 5 lists of enemies 
+                LoadHighScores();//LoadHighScore
+                SpawnPlayer();//SpawnPlayer
+                SpawnEnemies();//SpawnEnemies
+                SpawnShield();//SpawnShield
+                
 
 
-            // Initialize the timer to spawn the red spaceship every 15 seconds
-            DispatcherTimer redSpaceShipTimer = new DispatcherTimer();
-            redSpaceShipTimer.Interval = TimeSpan.FromSeconds(15);
-            redSpaceShipTimer.Tick += (s, e) => SpawnRedSpaceShip();
-            redSpaceShipTimer.Start();
+                // Initialize the timer to spawn the red spaceship every 15 seconds
+                DispatcherTimer redSpaceShipTimer = new DispatcherTimer();
+                redSpaceShipTimer.Interval = TimeSpan.FromSeconds(15);
+                if (player != null)
+                {
+                    redSpaceShipTimer.Tick += (s, e) => SpawnRedSpaceShip();
+                }
+                
+                redSpaceShipTimer.Start();
 
-            // Timer for spawning enemy bullets every 3 seconds
-            DispatcherTimer enemyBulletTimer = new DispatcherTimer();
-            enemyBulletTimer.Interval = TimeSpan.FromSeconds(3);
-            enemyBulletTimer.Tick += (s, e) => SpawnEnemyBullet();
-            enemyBulletTimer.Start();
+                // Timer for spawning enemy bullets every 3 seconds
+                DispatcherTimer enemyBulletTimer = new DispatcherTimer();
+                enemyBulletTimer.Interval = TimeSpan.FromSeconds(3);
+                if(player != null)
+                {
+                    enemyBulletTimer.Tick += (s, e) => SpawnEnemyBullet();
+                }
+                
+                enemyBulletTimer.Start();
+            }
+            
         }
 
         
@@ -142,11 +184,17 @@ namespace AvaloniaSpaceInvaders.ViewModels
         }
         private void MoveRight()//player move right 
         {
-            player.LocationX += 10;
+            if (player != null)
+            {
+                player.LocationX += 10;
+            }
         }
         private void MoveLeft()//player move left
-        {
-            player.LocationX -= 10;
+        {   if (player != null)
+            {
+                player.LocationX -= 10;
+            }
+            
         }
 
 
@@ -165,8 +213,8 @@ namespace AvaloniaSpaceInvaders.ViewModels
             {
                 for (int j = 0; j < 11; j++)
                 {
-                    
-                    var enemy = new EnemyViewModel(relativePathToAssets, 64, 64, 1, levelSpeed, false,-1);
+
+                    var enemy = new EnemyViewModel(relativePathToAssets, 64, 64, 1, levelSpeed, false, -1);
 
                     enemy.SetPosition(j * enemy.Width + enemySpacing, enemyLevel * enemy.Width);
                     Actors.Add(enemy);
@@ -174,6 +222,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
                 }
                 enemyLevel++;
             }
+
             setId();
         }
 
@@ -194,7 +243,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
 
 
-        private void SpawnShield()
+        private void SpawnShield()//spawns two rows of shields
         {
             string relativePathToAssets = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersShiled.png";
 
@@ -253,26 +302,30 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
 
 
-        private void SpawnRedSpaceShip()//SpawnRedSpaceShip 
+        private void SpawnRedSpaceShip()//SpawnRedSpaceShip every 15 seconds
         {
-            Random _random= new Random();
-            int randDir = _random.Next(0,2);
-            randDir = direction[randDir];
-            string relativePathToAssets = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersRedSpaceShipT.png";
-            redSpaceShip = new RedSpaceShipViewModel(relativePathToAssets, 64, 64, randDir, 1,true);
-            if(redSpaceShip.Direction == 1)
+            if(player!=null)
             {
-                redSpaceShip.SetPosition(0, 0);
-            }
-            else
-            {
-                redSpaceShip.SetPosition(GameBoardWidth-redSpaceShip.Width, 0);
+                Random _random = new Random();
+                int randDir = _random.Next(0, 2);
+                randDir = direction[randDir];
+                string relativePathToAssets = "avares://AvaloniaSpaceInvaders/Assets/SpaceInvadersRedSpaceShipT.png";
+                redSpaceShip = new RedSpaceShipViewModel(relativePathToAssets, 64, 64, randDir, 1, true);
+                if (redSpaceShip.Direction == 1)
+                {
+                    redSpaceShip.SetPosition(0, 0);
+                }
+                else
+                {
+                    redSpaceShip.SetPosition(GameBoardWidth - redSpaceShip.Width, 0);
+                }
+
+                Actors.Add(redSpaceShip);
             }
             
-            Actors.Add(redSpaceShip);   
         }
 
-        private void DeSpawnRedSpaceShip()//DeSpawnRedSpaceShip
+        private void DeSpawnRedSpaceShip()//DeSpawnRedSpaceShip if it passes the boarders 
         {
             if(redSpaceShip == null) return;
             else if(redSpaceShip.LocationX>GameBoardWidth - redSpaceShip.Width)
@@ -280,7 +333,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
                 _actors.Remove(redSpaceShip);
                 redSpaceShip = null;
             }
-            else if (redSpaceShip.LocationX<0)
+            else if (redSpaceShip.LocationX<-redSpaceShip.Width)
             {
                 _actors.Remove(redSpaceShip);
                 redSpaceShip = null;
@@ -289,7 +342,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
 
 
-        private void SpawnBullet()//SpawnBullet
+        private void SpawnBullet()//Spawn player Bullet
         {
             if (player == null || bullet != null) return;
 
@@ -303,7 +356,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
 
 
-        private void DeSpawnBullet()//DeSpawnBullet
+        private void DeSpawnBullet()//DeSpawnBullet if it passes the boarder
         {
             if (bullet!=null && bullet.LocationY < 0)
             {
@@ -313,16 +366,16 @@ namespace AvaloniaSpaceInvaders.ViewModels
                 
         }
 
-        private void SpawnEnemyBullet()//SpawnEnemyBullet
+        private void SpawnEnemyBullet()//Spawn Enemy Bullet,picks random enemy that does not have an active bullet 
         {
-            if (_enemiesList[0].Count==0) 
+            if (_enemiesList.Count==0 ||_enemiesList[0].Count==0 ) 
                 return;
 
             Random random =new Random();
 
             int rand = random.Next(0, _enemiesList[0].Count-1);
 
-            while (_enemiesList[0][rand].IsAlive == true)
+            while (_enemiesList[0][rand].IsAlive == true&& _enemiesList[0].Count>1)
             {
                 rand = random.Next(0, _enemiesList[0].Count - 1);
             }
@@ -336,7 +389,8 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         }
 
-        private void DeSpawnEnemyBullet()//DeSpawnEnemyBullet
+        private void DeSpawnEnemyBullet()//DeSpawn Enemy Bullet if it passes the boarder
+                                         //and sets the enemy bullet is alive to be false
         {
             foreach (var enemyBullet in _enemyBullets)
             {
@@ -358,53 +412,94 @@ namespace AvaloniaSpaceInvaders.ViewModels
         }
         private void GameWonFunc()//GameWonFunc - clears actors, and spawns everything again
         {
-            Lives = 3;
             levelSpeed += 1;
             _actors.Clear();
+            _Shileds.Clear();
+            _Shileds2.Clear();
+            _enemyBullets.Clear();
+            player = null;
+            bullet = null;
             SpawnPlayer();
             SpawnEnemies();
             SpawnShield();
             SpawnRedSpaceShip();
         }
 
-        private void GameOverFunc()//clears the screen and saves the current score if its new high score
+        private void GameOverFunc()// game over clears the screen and saves the current score if its new high score
         {
+            //bool highscore = false;
             if (Score >= HighScore)
             {
+
                 HighScore = Score;
-                SaveHighScore();
+                HighScoreName = CurrentName;
+                IsNameInputVisible = true;  // Show the input field
+                //highscore = true;
+                SaveHighScores();
             }
+            //NavigateToGameResultScreen();
             _actors.Clear();
-            
+            _enemiesList.Clear();
+            _Shileds.Clear();
+            _Shileds2.Clear();
+            _enemyBullets.Clear();
+            player = null;
+            bullet = null;
+            gameOver = true;
+            SubmitName();
+
+
         }
 
+        private void SubmitName()//function is cold when game is over 
+        {
+            if (!string.IsNullOrWhiteSpace(PlayerNameInput))
+            {
+                _highScoreModel.HighScores.Add(new HighScoreEntry//adds a new HighScoreEntry to HighScores list
+                {
+                    Name = PlayerNameInput,
+                    HighScore = Score
+                });
 
-        private void LoadHighScore()//loads high score from file 
+                // Sort the list and keep only the top 5
+                _highScoreModel.HighScores.Sort((x, y) => y.HighScore.CompareTo(x.HighScore));
+                if (_highScoreModel.HighScores.Count > 5)
+                {
+                    _highScoreModel.HighScores.RemoveAt(_highScoreModel.HighScores.Count - 1);
+                }
+
+                SaveHighScores();//send HighScores list into a Serializer
+                //NavigateToGameResultScreen();
+            }
+        }
+
+        //private void NavigateToGameResultScreen()
+        //{
+        //    App.MainWindow.Content = new GameResultScreen();
+        //}
+
+        private void LoadHighScores()
         {
             try
             {
                 if (File.Exists(HighScoreFilePath))
                 {
-                    var highScoreJson = File.ReadAllText(HighScoreFilePath);//gets file data
-                    var highScoreData = JsonSerializer.Deserialize<HighScoreModel>(highScoreJson);//Deserialize the data from file
-                    HighScore = highScoreData?.HighScore ?? 0;//if (highscore data from file == null) sets to 0
+                    var highScoreJson = File.ReadAllText(HighScoreFilePath);
+                    _highScoreModel = JsonSerializer.Deserialize<HighScoreModel>(highScoreJson) ?? new HighScoreModel();
                 }
             }
-            catch (Exception ex)//if there was a problem sets (high score = 0)
+            catch (Exception ex)
             {
-                // Handle exceptions, e.g., logging
-                HighScore = 0;
+                _highScoreModel = new HighScoreModel();
             }
         }
 
-        private void SaveHighScore()
+        private void SaveHighScores()
         {
             try
             {
-                var highScoreData = new HighScoreModel { HighScore = HighScore };//sets the current highscore to
-                                                                                 //highscore viewmodel data
-                var highScoreJson = JsonSerializer.Serialize(highScoreData);//Serialize the current viewmodel highscore
-                File.WriteAllText(HighScoreFilePath, highScoreJson);//writes the highscore in the file
+                var highScoreJson = JsonSerializer.Serialize(_highScoreModel);
+                File.WriteAllText(HighScoreFilePath, highScoreJson);
             }
             catch (Exception ex)
             {
@@ -423,7 +518,11 @@ namespace AvaloniaSpaceInvaders.ViewModels
             }
 
             // Collision: player with borders(value,min,max)
-            player.LocationX = Math.Clamp(player.LocationX, 0, GameBoardWidth - player.Width);
+            if (player != null)
+            {
+                player.LocationX = Math.Clamp(player.LocationX, 0, GameBoardWidth - player.Width);
+            }
+            
 
             // Despawn bullets and other objects
             if (bullet != null) DeSpawnBullet();
@@ -437,13 +536,13 @@ namespace AvaloniaSpaceInvaders.ViewModels
             }
 
             // Check for enemy bullet collision
-            if (_Shileds.Count > 0 && _enemiesList.All(row => row.Count > 0))
+            if ((_Shileds.Count > 0 || _Shileds2.Count>0) && _enemiesList.Any(row => row.Count > 0))
             {
                 doesEnemyBulletIntersect(_enemyBullets, _Shileds, _Shileds2);
             }
 
             // Determine closest and farthest enemies
-            if (_enemiesList.All(row => row.Count > 0))
+            if (_enemiesList.Any(row => row.Count > 0))// go over all lists
             {
                 var closestEnemy = getClosestEnemy();
                 var farestEnemy = getFarestEnemy();
@@ -460,13 +559,13 @@ namespace AvaloniaSpaceInvaders.ViewModels
             }
 
             // Check if the player has won the game
-            if (_enemiesList.All(row => row.Count == 0))
+            if (_enemiesList.All(row => row.Count == 0)&&gameOver!=true)
             {
                 GameWonFunc();
             }
 
             // Game over check
-            if (Lives <= 0)
+            if (Lives <= 0&& gameOver!=true)
             {
                 GameOverFunc();
                 // Direct to main view screen
@@ -492,15 +591,20 @@ namespace AvaloniaSpaceInvaders.ViewModels
         // Function for receiving the farthest enemy to the right wall
         private EnemyViewModel getFarestEnemy()
         {
+
             EnemyViewModel farestEnemy = _enemiesList[0][_enemiesList[0].Count - 1];
 
             foreach (var row in _enemiesList)
             {
-                var lastEnemyInRow = row[row.Count - 1];
-                if (lastEnemyInRow.LocationX > farestEnemy.LocationX)
+                if(row.Count != 0)
                 {
-                    farestEnemy = lastEnemyInRow;
+                    var lastEnemyInRow = row[row.Count - 1];
+                    if (lastEnemyInRow.LocationX > farestEnemy.LocationX)
+                    {
+                        farestEnemy = lastEnemyInRow;
+                    }
                 }
+                
             }
 
             return farestEnemy;
@@ -513,11 +617,15 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
             foreach (var row in _enemiesList)
             {
-                var firstEnemyInRow = row[0];
-                if (firstEnemyInRow.LocationX < closestEnemy.LocationX)
+                if (row.Count>0)
                 {
-                    closestEnemy = firstEnemyInRow;
+                    var firstEnemyInRow = row[0];
+                    if (firstEnemyInRow.LocationX < closestEnemy.LocationX)
+                    {
+                        closestEnemy = firstEnemyInRow;
+                    }
                 }
+                
             }
 
             return closestEnemy;
@@ -536,8 +644,11 @@ namespace AvaloniaSpaceInvaders.ViewModels
                 CheckBulletShieldCollision(shields, shields2);
                 CheckBulletRedSpaceShipCollision();
             }
-            
-            CheckEnemyPlayerCollision(enemiesList);
+            if (_enemiesList.All(row => row.Count != 0))
+            {
+                CheckEnemyPlayerCollision(enemiesList);
+
+            }
         }
 
 
@@ -576,14 +687,21 @@ namespace AvaloniaSpaceInvaders.ViewModels
 
         private void CheckShieldCollision(List<ShieldViewModel> shields)
         {
-            if (shields.Count == 0 || bullet==null||bullet.LocationY != shields[0].LocationY) return;
+            
+            if (shields.Count == 0 || bullet==null||
+                (bullet.LocationY < shields[0].LocationY || bullet.LocationY > shields[0].LocationY + shields[0].Height)) return;
 
             foreach (var shield in shields.ToList())
             {
                 if (bullet.Intersects(shield))
                 {
-                    shield.Source.Opacity += 100;
-                    if (shield.Source.Opacity > 1000)
+                    shield.HitCount++;
+                    if(shield.HitCount * 100%3==0)
+                    {
+                        shield.Source.Opacity = shield.HitCount * 100;
+                    }
+                    
+                    if (shield.Source.Opacity > 700)
                     {
                         _actors.Remove(shield);
                         shields.Remove(shield);
@@ -643,24 +761,30 @@ namespace AvaloniaSpaceInvaders.ViewModels
                     {
                         if (enemyBullet.Intersects(shiled))
                         {
+                            for (int i = 0; i < _enemiesList[0].Count - 1; i++)
+                            {
+                                if (_enemiesList[0][i].Id == enemyBullet.Id)
+                                {
+                                    _enemiesList[0][i].IsAlive = false;
+                                }
+                            }
                             //neede to add opacity shiled changes 
                             //shiled.Source.Transitions.Clear();
-                            shiled.Source.Opacity += 100;
-                            if (shiled.Source.Opacity > 1000)
+                            shiled.HitCount++;
+                            if (shiled.HitCount * 100 % 3 == 0)
+                            {
+                                shiled.Source.Opacity = shiled.HitCount * 100;
+                            }
+                            if (shiled.Source.Opacity > 700)
                             {
                                 _actors.Remove(shiled);
                                 _shields.Remove(shiled);
                             }
                             //set bullet alive = false , can now spawn bullets 
                             //_enemiesList[0][enemyBullet.Id].IsAlive = false;
-                            for(int i = 0; i < _enemiesList[0].Count - 1; i++)
-                            {
-                                if (_enemiesList[0][i].Id== enemyBullet.Id)
-                                {
-                                    _enemiesList[0][i].IsAlive = false;
-                                    
-                                }
-                            }
+                            setIsAlive(_enemyBullets, enemyBullet.Id);
+
+                            //remove the bullet from actors and enemybullets list 
                             _enemyBullets.Remove(enemyBullet);
                             _actors.Remove(enemyBullet);
                             return;
@@ -668,30 +792,37 @@ namespace AvaloniaSpaceInvaders.ViewModels
                     }
                 }
 
-                if (enemyBullet.LocationY >= _shields2[0].LocationY)
+                if (_shields2.Count>0&&enemyBullet.LocationY >= _shields2[0].LocationY 
+                    && enemyBullet.LocationY <= _shields2[0].LocationY + _shields2[0].Height)
                 {
                     foreach (var shiled in _shields2)
                     {
                         if (enemyBullet.Intersects(shiled))
                         {
-                            //neede to add opacity shiled changes 
-                            //shiled.Source.Transitions.Clear();
-                            shiled.Source.Opacity += 100;
-                            if (shiled.Source.Opacity > 1000)
-                            {
-                                _actors.Remove(shiled);
-                                _shields2.Remove(shiled);
-                            }
-                            //set bullet alive = false , can now spawn bullets 
-                            //_enemiesList[0][enemyBullet.Id].IsAlive = false;
+
                             for (int i = 0; i < _enemiesList[0].Count - 1; i++)
                             {
                                 if (_enemiesList[0][i].Id == enemyBullet.Id)
                                 {
                                     _enemiesList[0][i].IsAlive = false;
-                                    
                                 }
                             }
+                            //neede to add opacity shiled changes 
+                            //shiled.Source.Transitions.Clear();
+                            shiled.HitCount++;
+                            if (shiled.HitCount * 100 % 3 == 0)
+                            {
+                                shiled.Source.Opacity = shiled.HitCount * 100;
+                            }
+                            if (shiled.Source.Opacity > 700)
+                            {
+                                _actors.Remove(shiled);
+                                _shields.Remove(shiled);
+                            }
+                            //set bullet alive = false , can now spawn bullets 
+                            //_enemiesList[0][enemyBullet.Id].IsAlive = false;
+                            setIsAlive(_enemyBullets, enemyBullet.Id);
+
                             _enemyBullets.Remove(enemyBullet);
                             _actors.Remove(enemyBullet);
                             return;
@@ -707,22 +838,36 @@ namespace AvaloniaSpaceInvaders.ViewModels
                     
                     if (enemyBullet.Intersects(player))
                     {
-                        //set bullet alive = false , can now spawn bullets 
-                        //_enemiesList[0][enemyBullet.Id].IsAlive = false;
+
                         for (int i = 0; i < _enemiesList[0].Count - 1; i++)
                         {
                             if (_enemiesList[0][i].Id == enemyBullet.Id)
                             {
                                 _enemiesList[0][i].IsAlive = false;
-
                             }
                         }
+
+                        //set bullet alive = false , can now spawn bullets 
+                        //_enemiesList[0][enemyBullet.Id].IsAlive = false;
+                        setIsAlive(_enemyBullets, enemyBullet.Id);
                         Lives--;
                         _enemyBullets.Remove(enemyBullet);
                         _actors.Remove(enemyBullet);
                         return;
                     }
                     
+                }
+            }
+        }
+
+        private void setIsAlive(List<EnemyBulletViewModel> _enemyBullets,int enemyId)
+        {
+            for (int i = 0; i < _enemiesList[0].Count - 1; i++)
+            {
+                if (_enemiesList[0][i].Id == enemyId)
+                {
+                    _enemiesList[0][i].IsAlive = false;
+
                 }
             }
         }

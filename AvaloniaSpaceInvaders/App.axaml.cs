@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 
@@ -9,6 +10,7 @@ namespace AvaloniaSpaceInvaders;
 
 public partial class App : Application
 {
+    public static Window MainWindow { get; private set; }
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);

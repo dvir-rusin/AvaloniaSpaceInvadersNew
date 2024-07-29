@@ -15,6 +15,7 @@ namespace AvaloniaSpaceInvaders.ViewModels
         private int _direction;
         private int Speed { get; }
         private bool _isAlive;
+        private int _hitCount;
 
         public int Direction
         {
@@ -26,6 +27,12 @@ namespace AvaloniaSpaceInvaders.ViewModels
         {
             get => _isAlive;
             set => this.RaiseAndSetIfChanged(ref _isAlive, value);
+        }
+
+        public int HitCount
+        {
+            get => _hitCount;
+            set => this.RaiseAndSetIfChanged(ref _hitCount, value);
         }
         public ShieldViewModel(string imagePath, int width, int height,int direction,int speed,bool isalive) 
             : base(imagePath, width, height,isalive) 
